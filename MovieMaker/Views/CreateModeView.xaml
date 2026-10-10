@@ -68,12 +68,12 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="{x:Static styles:LayoutConstants.TimelineHeight}" />
+            <RowDefinition Height="{x:Static styles:LayoutConstants.TimelineHeightGridLength}" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{x:Static styles:LayoutConstants.PaletteWidth}" />
+                <ColumnDefinition Width="{x:Static styles:LayoutConstants.PaletteWidthGridLength}" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
