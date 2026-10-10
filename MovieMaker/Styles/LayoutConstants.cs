@@ -24,6 +24,16 @@ public static class LayoutConstants
     public const double TimelineHeight = 120;
     public const double DefaultDurationSeconds = 10.0;
 
+    // 新規オブジェクトの既定サイズ・配置。
+    public const double DefaultObjectWidth = 300;
+    public const double DefaultObjectHeight = 100;
+    public const double DefaultFontSize = 48;
+
+    // リサイズハンドルの表示サイズ(枠からのはみ出し量)。
+    public const double ResizeHandleSize = 20;
+    public const double ResizeHandleOverhang = 5;
+    public static readonly GridLength ResizeHandleGridLength = new(ResizeHandleSize);
+
     public static readonly Thickness RootMargin = new(8);
     public static readonly Thickness SectionSpacing = new(4);
     public static readonly Thickness FieldSpacing = new(0, 0, 0, 4);
