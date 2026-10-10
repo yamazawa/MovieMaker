@@ -42,6 +42,11 @@ public static class LayoutConstants
     public const double TimelinePixelsPerSecond = 80;
     public const double TimelineRowHeight = 24;
 
+    // タイムラインバー端の開始/終了ドラッグハンドル幅(こちらは1秒単位で編集する)。
+    public const double TimelineEdgeHandleWidth = 10;
+    public static readonly GridLength TimelineEdgeHandleGridLength = new(TimelineEdgeHandleWidth);
+    public const double TimelineEdgeStepSeconds = 1.0;
+
     // 再生モードのループ更新間隔(約30fps)。
     public const int PlaybackFrameIntervalMilliseconds = 33;
 
