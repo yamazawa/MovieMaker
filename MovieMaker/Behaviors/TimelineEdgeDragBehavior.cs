@@ -74,6 +74,7 @@ public static class TimelineEdgeDragBehavior
     {
         var handle = (FrameworkElement)sender;
         handle.ReleaseMouseCapture();
+        TimelineSortHelper.RefreshSortOrder(handle);
     }
 
     private static T? FindAncestor<T>(DependencyObject element) where T : DependencyObject
