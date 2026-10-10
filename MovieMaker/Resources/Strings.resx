@@ -103,4 +103,19 @@
   <data name="Label_TimelineZoomY" xml:space="preserve">
     <value>タイムライン拡大(縦)</value>
   </data>
+  <data name="Header_AlignSizes" xml:space="preserve">
+    <value>サイズを揃える</value>
+  </data>
+  <data name="Button_SetAlignBase" xml:space="preserve">
+    <value>選択中を基準に設定</value>
+  </data>
+  <data name="Label_AlignBase" xml:space="preserve">
+    <value>基準</value>
+  </data>
+  <data name="Label_AlignTargets" xml:space="preserve">
+    <value>揃えたいオブジェクト</value>
+  </data>
+  <data name="Button_ConfirmAlignSizes" xml:space="preserve">
+    <value>確定</value>
+  </data>
 </root>

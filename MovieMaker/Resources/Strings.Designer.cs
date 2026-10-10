@@ -190,5 +190,50 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Label_TimelineZoomY", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   サイズを揃える に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Header_AlignSizes {
+            get {
+                return ResourceManager.GetString("Header_AlignSizes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   選択中を基準に設定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_SetAlignBase {
+            get {
+                return ResourceManager.GetString("Button_SetAlignBase", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   基準 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_AlignBase {
+            get {
+                return ResourceManager.GetString("Label_AlignBase", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   揃えたいオブジェクト に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_AlignTargets {
+            get {
+                return ResourceManager.GetString("Label_AlignTargets", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   確定 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_ConfirmAlignSizes {
+            get {
+                return ResourceManager.GetString("Button_ConfirmAlignSizes", resourceCulture);
+            }
+        }
     }
 }

@@ -80,53 +80,85 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- 左 : 編集パレット。選択中オブジェクトの編集項目はタスク4で追加する。 -->
-            <DockPanel Grid.Column="0" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
-                <TextBlock DockPanel.Dock="Top" Text="{x:Static resx:Strings.Header_Palette}"
-                           FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddText}"
-                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
-                        Command="{Binding AddTextCommand}" />
-                <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddImage}"
-                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
-                        Command="{Binding AddImageFromClipboardCommand}" />
-
-                <!-- 動画全体の長さ(1秒～10分)。入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
-                <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
-                    <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding Duration, StringFormat=F1}"
-                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                </StackPanel>
-
-                <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
-                <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
-                            Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">
-                    <TextBlock Text="{x:Static resx:Strings.Header_ObjectProperties}"
+            <!-- 左 : 編集パレット。 -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
+                <StackPanel>
+                    <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
                                FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <Button Content="{x:Static resx:Strings.Button_AddText}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddTextCommand}" />
+                    <Button Content="{x:Static resx:Strings.Button_AddImage}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddImageFromClipboardCommand}" />
 
-                    <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}">
-                        <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                        <TextBox Text="{Binding SelectedObject.Text, UpdateSourceTrigger=PropertyChanged}"
-                                 AcceptsReturn="True" TextWrapping="Wrap"
-                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                        <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                        <TextBox Text="{Binding SelectedObject.FontSize}"
+                    <!-- 動画全体の長さ(1秒～10分)。入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding Duration, StringFormat=F1}"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     </StackPanel>
 
-                    <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
-                    <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding SelectedObject.StartTime, StringFormat=F1}"
-                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding SelectedObject.EndTime, StringFormat=F1}"
-                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
+                                Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_ObjectProperties}"
+                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
 
-                    <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
-                            HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
-                            Command="{Binding DeleteSelectedCommand}" />
+                        <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}">
+                            <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBox Text="{Binding SelectedObject.Text, UpdateSourceTrigger=PropertyChanged}"
+                                     AcceptsReturn="True" TextWrapping="Wrap"
+                                     Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBox Text="{Binding SelectedObject.FontSize}"
+                                     Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        </StackPanel>
+
+                        <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
+                        <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.StartTime, StringFormat=F1}"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.EndTime, StringFormat=F1}"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+
+                        <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
+                                HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding DeleteSelectedCommand}" />
+                    </StackPanel>
+
+                    <!-- サイズを揃える。①基準に設定 → ②対象をチェック → ③確定で、対象の幅高さを基準に揃える。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_AlignSizes}"
+                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <Button Content="{x:Static resx:Strings.Button_SetAlignBase}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding SetAlignBaseCommand}"
+                                Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}" />
+
+                        <StackPanel Visibility="{Binding AlignBaseObject, Converter={StaticResource NullToVisibilityConverter}}">
+                            <TextBlock Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
+                                <Run Text="{x:Static resx:Strings.Label_AlignBase}" />
+                                <Run Text=": " />
+                                <Run Text="{Binding AlignBaseObject.DisplayLabel, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock Text="{x:Static resx:Strings.Label_AlignTargets}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <ItemsControl ItemsSource="{Binding Objects}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding DisplayLabel}" IsChecked="{Binding IsAlignTarget}"
+                                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <Button Content="{x:Static resx:Strings.Button_ConfirmAlignSizes}"
+                                    HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding ConfirmAlignSizesCommand}" />
+                        </StackPanel>
+                    </StackPanel>
                 </StackPanel>
-            </DockPanel>
+            </ScrollViewer>
 
             <!-- 中央 : キャンバス(動画本体)。画像ファイルのドラッグ&ドロップでも画像オブジェクトを追加できる。 -->
             <Viewbox Grid.Column="1" Stretch="Uniform" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
