@@ -225,10 +225,10 @@ public partial class MainViewModel : ObservableObject
         SelectedObject = sceneObject;
     }
 
-    // キャンバス/タイムラインのブロッククリックで呼ばれる。
+    // キャンバス/タイムラインのブロッククリック共通処理。
     // サイズ揃えの基準(AlignBaseObject)を選択中は、クリックしたブロックを対象(IsAlignTarget)に追加/除外する。
-    [RelayCommand]
-    private void SelectObject(SceneObjectViewModel sceneObject)
+    // タイムライン側のクリックの場合、現在時刻をそのオブジェクトの表示区間の中心へ移動する。
+    private void HandleObjectClick(SceneObjectViewModel sceneObject, bool isTimelineClick)
     {
         if (AlignBaseObject is not null)
         {
@@ -239,6 +239,29 @@ public partial class MainViewModel : ObservableObject
         }
 
         SetSelectedObject(sceneObject);
+
+        if (isTimelineClick)
+            CurrentTime = Math.Clamp((sceneObject.StartTime + sceneObject.EndTime) / 2, 0, Duration);
+    }
+
+    [RelayCommand]
+    private void SelectObject(SceneObjectViewModel sceneObject) => HandleObjectClick(sceneObject, isTimelineClick: false);
+
+    [RelayCommand]
+    private void SelectTimelineObject(SceneObjectViewModel sceneObject) => HandleObjectClick(sceneObject, isTimelineClick: true);
+
+    // タイムチャートを①開始時刻の昇順、②開始時刻が同じ場合は終了時刻の降順、で並べ替える。
+    [RelayCommand]
+    private void SortObjects()
+    {
+        var sorted = Objects.OrderBy(obj => obj.StartTime).ThenByDescending(obj => obj.EndTime).ToList();
+
+        for (var i = 0; i < sorted.Count; i++)
+        {
+            var currentIndex = Objects.IndexOf(sorted[i]);
+            if (currentIndex != i)
+                Objects.Move(currentIndex, i);
+        }
     }
 
     [RelayCommand]
