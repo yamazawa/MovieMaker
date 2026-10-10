@@ -88,6 +88,13 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _backgroundColorHex = LayoutConstants.DefaultBackgroundColorHex;
 
+    // タイムラインの拡縮率(横:1秒あたりpx数、縦:1行の高さ)。
+    [ObservableProperty]
+    private double _timelinePixelsPerSecond = LayoutConstants.TimelinePixelsPerSecond;
+
+    [ObservableProperty]
+    private double _timelineRowHeight = LayoutConstants.TimelineRowHeight;
+
     [ObservableProperty]
     private SceneObjectViewModel? _selectedObject;
 
@@ -196,7 +203,32 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
 
-    partial void OnDurationChanged(double value) => MarkDirty();
+    // 動画の長さは1秒～10分の範囲にクランプする。
+    partial void OnDurationChanged(double value)
+    {
+        var clamped = Math.Clamp(Math.Round(value, 1), LayoutConstants.MinDurationSeconds, LayoutConstants.MaxDurationSeconds);
+        if (clamped != value)
+        {
+            Duration = clamped;
+            return;
+        }
+
+        MarkDirty();
+    }
+
+    partial void OnTimelinePixelsPerSecondChanged(double value)
+    {
+        var clamped = Math.Clamp(value, LayoutConstants.TimelineZoomXMin, LayoutConstants.TimelineZoomXMax);
+        if (clamped != value)
+            TimelinePixelsPerSecond = clamped;
+    }
+
+    partial void OnTimelineRowHeightChanged(double value)
+    {
+        var clamped = Math.Clamp(value, LayoutConstants.TimelineZoomYMin, LayoutConstants.TimelineZoomYMax);
+        if (clamped != value)
+            TimelineRowHeight = clamped;
+    }
 
     private void OnObjectsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
