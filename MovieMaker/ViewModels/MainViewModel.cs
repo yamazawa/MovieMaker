@@ -25,8 +25,9 @@ public partial class MainViewModel : ObservableObject
     private readonly ImageAssetService _imageAssetService;
     private readonly MovieProjectService _movieProjectService;
     private readonly DispatcherTimer _playbackTimer;
+    private readonly Stack<MovieProject> _undoStack = new();
 
-    // 復元中はユーザー操作ではないため、MarkDirtyを抑制するためのガード。
+    // 復元中はユーザー操作ではないため、MarkDirty/Undoスナップショット記録を抑制するためのガード。
     private bool _isRestoring;
     private bool _isDirty;
     private DateTime _lastPlaybackTick;
@@ -52,7 +53,7 @@ public partial class MainViewModel : ObservableObject
         if (!_isDirty)
             return;
 
-        _movieProjectService.Save(new MovieProject(Duration, BackgroundColorHex, Objects.Select(obj => obj.ToModel()).ToList()));
+        _movieProjectService.Save(CaptureSnapshot());
         _isDirty = false;
     }
 
@@ -65,6 +66,8 @@ public partial class MainViewModel : ObservableObject
         _isRestoring = true;
         Duration = project.Duration;
         BackgroundColorHex = project.BackgroundColorHex;
+        TimelinePixelsPerSecond = project.TimelinePixelsPerSecond > 0 ? project.TimelinePixelsPerSecond : LayoutConstants.TimelinePixelsPerSecond;
+        TimelineRowHeight = project.TimelineRowHeight > 0 ? project.TimelineRowHeight : LayoutConstants.TimelineRowHeight;
         foreach (var model in project.Objects)
             Objects.Add(SceneObjectViewModel.FromModel(model, _imageAssetService));
         _isRestoring = false;
@@ -76,6 +79,56 @@ public partial class MainViewModel : ObservableObject
     {
         if (!_isRestoring)
             _isDirty = true;
+    }
+
+    private MovieProject CaptureSnapshot() =>
+        new(Duration, BackgroundColorHex, TimelinePixelsPerSecond, TimelineRowHeight, Objects.Select(obj => obj.ToModel()).ToList());
+
+    /// <summary>
+    /// 編集操作の直前に呼ぶ(各ドラッグ系ビヘイビアのMouseLeftButtonDown、TextBoxのGotFocus、各編集コマンドの先頭から)。
+    /// その時点の状態をUndoスタックへ積む。
+    /// </summary>
+    public void BeginUndoableChange()
+    {
+        if (_isRestoring)
+            return;
+
+        _undoStack.Push(CaptureSnapshot());
+        UndoCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanUndo() => _undoStack.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private void Undo()
+    {
+        if (_undoStack.Count == 0)
+            return;
+
+        ApplySnapshot(_undoStack.Pop());
+        UndoCommand.NotifyCanExecuteChanged();
+    }
+
+    // Undoでは表示設定(TimelinePixelsPerSecond/TimelineRowHeight)は書き戻さない。編集操作の取り消し対象ではないため。
+    private void ApplySnapshot(MovieProject snapshot)
+    {
+        _isRestoring = true;
+
+        SelectedObject = null;
+        AlignBaseObject = null;
+        AlignTargetCount = 0;
+
+        Objects.Clear();
+        foreach (var model in snapshot.Objects)
+            Objects.Add(SceneObjectViewModel.FromModel(model, _imageAssetService));
+
+        Duration = snapshot.Duration;
+        BackgroundColorHex = snapshot.BackgroundColorHex;
+
+        _isRestoring = false;
+
+        RefreshVisibleObjects();
+        MarkDirty();
     }
 
     [ObservableProperty]
@@ -145,6 +198,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void AddText()
     {
+        BeginUndoableChange();
+
         var sceneObject = new SceneObjectViewModel(
             SceneObjectType.Text,
             x: (LayoutConstants.CanvasWidth - LayoutConstants.DefaultObjectWidth) / 2,
@@ -192,6 +247,8 @@ public partial class MainViewModel : ObservableObject
 
     private void AddImageObject(BitmapSource image)
     {
+        BeginUndoableChange();
+
         var maxWidth = LayoutConstants.CanvasWidth * 0.6;
         var maxHeight = LayoutConstants.CanvasHeight * 0.6;
         var scale = Math.Min(1.0, Math.Min(maxWidth / image.PixelWidth, maxHeight / image.PixelHeight));
@@ -227,7 +284,7 @@ public partial class MainViewModel : ObservableObject
 
     // キャンバス/タイムラインのブロッククリック共通処理。
     // サイズ揃えの基準(AlignBaseObject)を選択中は、クリックしたブロックを対象(IsAlignTarget)に追加/除外する。
-    // タイムライン側のクリックの場合、現在時刻をそのオブジェクトの表示区間の中心へ移動する。
+    // タイムライン側のクリックの場合、現在時刻が既にそのオブジェクトの表示区間内に無ければ、表示開始時刻(左端)へ移動する。
     private void HandleObjectClick(SceneObjectViewModel sceneObject, bool isTimelineClick)
     {
         if (AlignBaseObject is not null)
@@ -240,8 +297,12 @@ public partial class MainViewModel : ObservableObject
 
         SetSelectedObject(sceneObject);
 
-        if (isTimelineClick)
-            CurrentTime = Math.Clamp((sceneObject.StartTime + sceneObject.EndTime) / 2, 0, Duration);
+        if (!isTimelineClick)
+            return;
+
+        var isCurrentTimeInRange = CurrentTime >= sceneObject.StartTime && CurrentTime < sceneObject.EndTime;
+        if (!isCurrentTimeInRange)
+            CurrentTime = Math.Clamp(sceneObject.StartTime, 0, Duration);
     }
 
     [RelayCommand]
@@ -254,6 +315,8 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void SortObjects()
     {
+        BeginUndoableChange();
+
         var sorted = Objects.OrderBy(obj => obj.StartTime).ThenByDescending(obj => obj.EndTime).ToList();
 
         for (var i = 0; i < sorted.Count; i++)
@@ -269,6 +332,8 @@ public partial class MainViewModel : ObservableObject
     {
         if (SelectedObject is null)
             return;
+
+        BeginUndoableChange();
 
         Objects.Remove(SelectedObject);
         SelectedObject = null;
@@ -288,6 +353,8 @@ public partial class MainViewModel : ObservableObject
     {
         if (AlignBaseObject is not { } baseObject)
             return;
+
+        BeginUndoableChange();
 
         foreach (var obj in Objects.Where(obj => obj.IsAlignTarget && obj != baseObject))
         {
