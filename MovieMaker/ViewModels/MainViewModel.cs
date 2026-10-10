@@ -160,6 +160,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private int _alignTargetCount;
 
+    // 時間の挿入・削除で使う秒数(現在時刻を起点とする)。
+    [ObservableProperty]
+    private double _timeAdjustSeconds = 1.0;
+
     public ObservableCollection<SceneObjectViewModel> Objects { get; } = [];
 
     // 現在時刻に表示範囲が重なるオブジェクトのみ。キャンバスの表示にバインドする。
@@ -377,7 +381,80 @@ public partial class MainViewModel : ObservableObject
         AlignBaseObject = null;
     }
 
+    // 現在時刻の位置にTimeAdjustSeconds分の時間を挿入する(引き延ばし)。
+    // 現在時刻を跨ぐオブジェクト(開始<=現在時刻<終了)は終了時刻が伸び、
+    // 現在時刻より後ろにある(開始>現在時刻)オブジェクトは丸ごと後ろへずれる。
+    [RelayCommand]
+    private void InsertTime()
+    {
+        if (TimeAdjustSeconds <= 0)
+            return;
+
+        BeginUndoableChange();
+
+        foreach (var obj in Objects)
+        {
+            // Start側は変化しないか現在値のままのため、先にEnd側(広がる側)を反映してからStartを反映する。
+            obj.EndTime = ShiftForInsert(obj.EndTime, CurrentTime, TimeAdjustSeconds);
+            obj.StartTime = ShiftForInsert(obj.StartTime, CurrentTime, TimeAdjustSeconds);
+        }
+
+        Duration += TimeAdjustSeconds;
+    }
+
+    private static double ShiftForInsert(double time, double insertAt, double insertSeconds) =>
+        time <= insertAt ? time : time + insertSeconds;
+
+    // 現在時刻からTimeAdjustSeconds分の区間を削除する(挿入の逆)。
+    // 区間に完全に含まれるオブジェクトは削除し、区間と重なるオブジェクトは重なった分だけ短くする。
+    [RelayCommand]
+    private void DeleteTimeRange()
+    {
+        if (TimeAdjustSeconds <= 0)
+            return;
+
+        BeginUndoableChange();
+
+        var deleteStart = CurrentTime;
+        var deleteEnd = CurrentTime + TimeAdjustSeconds;
+
+        for (var i = Objects.Count - 1; i >= 0; i--)
+        {
+            var obj = Objects[i];
+            var newStart = ShiftForDelete(obj.StartTime, deleteStart, deleteEnd);
+            var newEnd = ShiftForDelete(obj.EndTime, deleteStart, deleteEnd);
+
+            if (newEnd <= newStart)
+            {
+                Objects.RemoveAt(i);
+                continue;
+            }
+
+            // Start/End共に縮む(か変化しない)方向のため、先にStart側を反映してからEnd側を反映する。
+            obj.StartTime = newStart;
+            obj.EndTime = newEnd;
+        }
+
+        if (SelectedObject is not null && !Objects.Contains(SelectedObject))
+            SelectedObject = null;
+
+        if (AlignBaseObject is not null && !Objects.Contains(AlignBaseObject))
+            AlignBaseObject = null;
+
+        Duration = Math.Max(LayoutConstants.MinDurationSeconds, Duration - TimeAdjustSeconds);
+    }
+
+    private static double ShiftForDelete(double time, double deleteStart, double deleteEnd) =>
+        time < deleteStart ? time : (time >= deleteEnd ? time - (deleteEnd - deleteStart) : deleteStart);
+
     partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
+
+    partial void OnTimeAdjustSecondsChanged(double value)
+    {
+        var clamped = Math.Max(LayoutConstants.TimeStepSeconds, Math.Round(value, 1));
+        if (clamped != value)
+            TimeAdjustSeconds = clamped;
+    }
 
     // 動画の長さは1秒～10分の範囲にクランプする。
     partial void OnDurationChanged(double value)
