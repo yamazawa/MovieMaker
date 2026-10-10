@@ -128,9 +128,10 @@
                 </StackPanel>
             </DockPanel>
 
-            <!-- 中央 : キャンバス(動画本体)。画像オブジェクトの追加はタスク3で追加する。 -->
+            <!-- 中央 : キャンバス(動画本体)。画像ファイルのドラッグ&ドロップでも画像オブジェクトを追加できる。 -->
             <Viewbox Grid.Column="1" Stretch="Uniform" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
-                <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
+                <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}"
+                      behaviors:ImageDropBehavior.Command="{Binding AddImageFromFileCommand}">
                     <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
                     <ItemsControl Background="Transparent" ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
                                   ItemContainerStyle="{StaticResource ObjectContainerStyle}">
