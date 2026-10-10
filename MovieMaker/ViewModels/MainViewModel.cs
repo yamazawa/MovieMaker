@@ -97,4 +97,14 @@ public partial class MainViewModel : ObservableObject
 
         SelectedObject = sceneObject;
     }
+
+    [RelayCommand]
+    private void DeleteSelected()
+    {
+        if (SelectedObject is null)
+            return;
+
+        Objects.Remove(SelectedObject);
+        SelectedObject = null;
+    }
 }
