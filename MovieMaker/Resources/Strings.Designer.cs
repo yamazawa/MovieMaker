@@ -271,5 +271,41 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_Undo", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   時間の挿入・削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Header_TimeAdjust {
+            get {
+                return ResourceManager.GetString("Header_TimeAdjust", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   秒数 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_TimeAdjustSeconds {
+            get {
+                return ResourceManager.GetString("Label_TimeAdjustSeconds", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   現在時刻に挿入 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_InsertTime {
+            get {
+                return ResourceManager.GetString("Button_InsertTime", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   現在時刻から削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_DeleteTimeRange {
+            get {
+                return ResourceManager.GetString("Button_DeleteTimeRange", resourceCulture);
+            }
+        }
     }
 }

@@ -111,6 +111,23 @@
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     </StackPanel>
 
+                    <!-- 時間の挿入・削除。現在時刻を起点に、秒数分の時間を一括で挿入/削除する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_TimeAdjust}"
+                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBlock Text="{x:Static resx:Strings.Label_TimeAdjustSeconds}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding TimeAdjustSeconds, StringFormat=F1}"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{x:Static resx:Strings.Button_InsertTime}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding InsertTimeCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_DeleteTimeRange}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding DeleteTimeRangeCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+
                     <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
                                 Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">

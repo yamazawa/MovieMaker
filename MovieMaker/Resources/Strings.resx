@@ -130,4 +130,16 @@
   <data name="Button_Undo" xml:space="preserve">
     <value>元に戻す(Ctrl+Z)</value>
   </data>
+  <data name="Header_TimeAdjust" xml:space="preserve">
+    <value>時間の挿入・削除</value>
+  </data>
+  <data name="Label_TimeAdjustSeconds" xml:space="preserve">
+    <value>秒数</value>
+  </data>
+  <data name="Button_InsertTime" xml:space="preserve">
+    <value>現在時刻に挿入</value>
+  </data>
+  <data name="Button_DeleteTimeRange" xml:space="preserve">
+    <value>現在時刻から削除</value>
+  </data>
 </root>
