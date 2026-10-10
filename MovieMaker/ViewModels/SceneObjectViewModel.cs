@@ -46,6 +46,9 @@ public partial class SceneObjectViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    // タイムライン上の表示区間バーの幅に使う(StartTime/EndTimeから算出)。
+    public double DurationSeconds => EndTime - StartTime;
+
     public SceneObjectViewModel(SceneObjectType type, double x, double y, double width, double height, double startTime, double endTime)
     {
         Type = type;
@@ -63,6 +66,8 @@ public partial class SceneObjectViewModel : ObservableObject
         var clamped = Math.Round(Math.Max(0, Math.Min(value, EndTime - LayoutConstants.TimeStepSeconds)), 1);
         if (clamped != value)
             StartTime = clamped;
+
+        OnPropertyChanged(nameof(DurationSeconds));
     }
 
     partial void OnEndTimeChanged(double value)
@@ -70,6 +75,8 @@ public partial class SceneObjectViewModel : ObservableObject
         var clamped = Math.Round(Math.Max(value, StartTime + LayoutConstants.TimeStepSeconds), 1);
         if (clamped != value)
             EndTime = clamped;
+
+        OnPropertyChanged(nameof(DurationSeconds));
     }
 
     partial void OnFontSizeChanged(double value)

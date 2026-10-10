@@ -33,6 +33,10 @@ public static class LayoutConstants
     // 表示時間は0.1秒単位。開始と終了の間に最低限確保する間隔。
     public const double TimeStepSeconds = 0.1;
 
+    // タイムライン(スライドバー兼タイミングチャート)。
+    public const double TimelinePixelsPerSecond = 80;
+    public const double TimelineRowHeight = 24;
+
     // リサイズハンドルの表示サイズ(枠からのはみ出し量)。
     public const double ResizeHandleSize = 20;
     public const double ResizeHandleOverhang = 5;
