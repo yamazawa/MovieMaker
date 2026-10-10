@@ -7,6 +7,7 @@
              xmlns:resx="clr-namespace:MovieMaker.Resources"
              xmlns:conv="clr-namespace:MovieMaker.Converters"
              xmlns:behaviors="clr-namespace:MovieMaker.Behaviors"
+             xmlns:views="clr-namespace:MovieMaker.Views"
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
@@ -122,7 +123,7 @@
             <Viewbox Grid.Column="1" Stretch="Uniform" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
                 <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
                     <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
-                    <ItemsControl Background="Transparent" ItemsSource="{Binding Objects}" ItemTemplate="{StaticResource ObjectTemplate}"
+                    <ItemsControl Background="Transparent" ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
                                   ItemContainerStyle="{StaticResource ObjectContainerStyle}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
@@ -134,7 +135,7 @@
             </Viewbox>
         </Grid>
 
-        <!-- 下部 : タイムライン。スライドバー兼タイミングチャートの本実装はタスク5で追加する。 -->
-        <Border Grid.Row="1" Margin="{x:Static styles:LayoutConstants.SectionSpacing}" BorderThickness="1" BorderBrush="Gray" />
+        <!-- 下部 : タイムライン(スライドバー兼タイミングチャート)。 -->
+        <views:TimelineControl Grid.Row="1" Margin="{x:Static styles:LayoutConstants.SectionSpacing}" />
     </Grid>
 </UserControl>
