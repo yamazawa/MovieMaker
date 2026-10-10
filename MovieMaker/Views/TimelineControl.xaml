@@ -4,28 +4,58 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:styles="clr-namespace:MovieMaker.Styles"
+             xmlns:resx="clr-namespace:MovieMaker.Resources"
              xmlns:conv="clr-namespace:MovieMaker.Converters"
              xmlns:behaviors="clr-namespace:MovieMaker.Behaviors"
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d">
     <UserControl.Resources>
-        <conv:SecondsToPixelsConverter x:Key="SecondsToPixelsConverter" />
-        <conv:AlternationIndexToRowTopConverter x:Key="AlternationIndexToRowTopConverter" />
+        <conv:MultiplyConverter x:Key="MultiplyConverter" />
         <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
 
-        <!-- オブジェクトごとに1行を割り当て、重ならないよう縦に積む。 -->
+        <!-- タイムチャート内のオブジェクトは開始時刻の昇順で並べる(表示用の並び替えのみで、Objects本体の順序は変えない)。 -->
+        <CollectionViewSource x:Key="SortedObjects" Source="{Binding Objects}" IsLiveSortingRequested="True">
+            <CollectionViewSource.SortDescriptions>
+                <scm:SortDescription PropertyName="StartTime" Direction="Ascending" />
+            </CollectionViewSource.SortDescriptions>
+            <CollectionViewSource.LiveSortingProperties>
+                <system:String>StartTime</system:String>
+            </CollectionViewSource.LiveSortingProperties>
+        </CollectionViewSource>
+
+        <!-- オブジェクトごとに1行を割り当て、重ならないよう縦に積む。行の高さは縦方向の拡縮に応じて変わる。 -->
         <Style x:Key="BarContainerStyle" TargetType="ContentPresenter">
-            <Setter Property="Canvas.Left" Value="{Binding StartTime, Converter={StaticResource SecondsToPixelsConverter}}" />
-            <Setter Property="Canvas.Top"
-                    Value="{Binding RelativeSource={RelativeSource Self}, Path=(ItemsControl.AlternationIndex), Converter={StaticResource AlternationIndexToRowTopConverter}}" />
+            <Setter Property="Canvas.Left">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding Path="StartTime" />
+                        <Binding Path="DataContext.TimelinePixelsPerSecond" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Canvas.Top">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding RelativeSource="{RelativeSource Self}" Path="(ItemsControl.AlternationIndex)" />
+                        <Binding Path="DataContext.TimelineRowHeight" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <!-- クリックで選択、左右端のドラッグで表示開始/終了時刻を1秒単位で編集できる。 -->
         <DataTemplate x:Key="BarTemplate">
-            <Border Width="{Binding DurationSeconds, Converter={StaticResource SecondsToPixelsConverter}}"
-                    Height="{x:Static styles:LayoutConstants.TimelineRowHeight}"
+            <Border Height="{Binding DataContext.TimelineRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Background="SteelBlue" CornerRadius="2" Cursor="Hand"
                     BorderThickness="2" BorderBrush="{Binding IsSelected, Converter={StaticResource SelectionBrushConverter}}"
                     behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                <Border.Width>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding Path="DurationSeconds" />
+                        <Binding Path="DataContext.TimelinePixelsPerSecond" RelativeSource="{RelativeSource AncestorType=UserControl}" />
+                    </MultiBinding>
+                </Border.Width>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{x:Static styles:LayoutConstants.TimelineEdgeHandleGridLength}" />
@@ -40,25 +70,68 @@
     </UserControl.Resources>
 
     <!-- DataContextはMainViewModelをそのまま継承する(このControl専用のDependencyPropertyは持たない)。 -->
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-        <Canvas Width="{Binding Duration, Converter={StaticResource SecondsToPixelsConverter}}"
-                Background="Transparent"
-                behaviors:TimelineScrubBehavior.IsEnabled="True"
-                behaviors:TimelineScrubBehavior.CurrentTime="{Binding CurrentTime, Mode=TwoWay}"
-                behaviors:TimelineScrubBehavior.Duration="{Binding Duration}">
-            <ItemsControl ItemsSource="{Binding Objects}" ItemTemplate="{StaticResource BarTemplate}"
-                          ItemContainerStyle="{StaticResource BarContainerStyle}" AlternationCount="1000">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
 
-            <!-- 現在の再生位置を示す縦線。 -->
-            <Border Width="2" Background="Red" IsHitTestVisible="False"
-                    Height="{x:Static styles:LayoutConstants.TimelineHeight}"
-                    Canvas.Left="{Binding CurrentTime, Converter={StaticResource SecondsToPixelsConverter}}" />
-        </Canvas>
-    </ScrollViewer>
+        <!-- 拡縮(ズーム)。横:秒あたりpx数、縦:1行の高さ。 -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal">
+            <TextBlock Text="{x:Static resx:Strings.Label_TimelineZoomX}" VerticalAlignment="Center" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}" />
+            <Slider Width="120" VerticalAlignment="Center"
+                    Minimum="{x:Static styles:LayoutConstants.TimelineZoomXMin}" Maximum="{x:Static styles:LayoutConstants.TimelineZoomXMax}"
+                    Value="{Binding TimelinePixelsPerSecond}" />
+            <TextBlock Text="{x:Static resx:Strings.Label_TimelineZoomY}" VerticalAlignment="Center" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}" />
+            <Slider Width="120" VerticalAlignment="Center"
+                    Minimum="{x:Static styles:LayoutConstants.TimelineZoomYMin}" Maximum="{x:Static styles:LayoutConstants.TimelineZoomYMax}"
+                    Value="{Binding TimelineRowHeight}" />
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+            <Canvas Background="Transparent"
+                    behaviors:TimelineScrubBehavior.IsEnabled="True"
+                    behaviors:TimelineScrubBehavior.CurrentTime="{Binding CurrentTime, Mode=TwoWay}"
+                    behaviors:TimelineScrubBehavior.Duration="{Binding Duration}"
+                    behaviors:TimelineScrubBehavior.PixelsPerSecond="{Binding TimelinePixelsPerSecond}">
+                <Canvas.Width>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding Path="Duration" />
+                        <Binding Path="TimelinePixelsPerSecond" />
+                    </MultiBinding>
+                </Canvas.Width>
+                <Canvas.Height>
+                    <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                        <Binding Path="Objects.Count" />
+                        <Binding Path="TimelineRowHeight" />
+                    </MultiBinding>
+                </Canvas.Height>
+
+                <ItemsControl ItemsSource="{Binding Source={StaticResource SortedObjects}}" ItemTemplate="{StaticResource BarTemplate}"
+                              ItemContainerStyle="{StaticResource BarContainerStyle}" AlternationCount="1000">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <!-- 現在の再生位置を示す縦線。 -->
+                <Border Width="2" Background="Red" IsHitTestVisible="False">
+                    <Border.Height>
+                        <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                            <Binding Path="Objects.Count" />
+                            <Binding Path="TimelineRowHeight" />
+                        </MultiBinding>
+                    </Border.Height>
+                    <Canvas.Left>
+                        <MultiBinding Converter="{StaticResource MultiplyConverter}">
+                            <Binding Path="CurrentTime" />
+                            <Binding Path="TimelinePixelsPerSecond" />
+                        </MultiBinding>
+                    </Canvas.Left>
+                </Border>
+            </Canvas>
+        </ScrollViewer>
+    </Grid>
 </UserControl>
