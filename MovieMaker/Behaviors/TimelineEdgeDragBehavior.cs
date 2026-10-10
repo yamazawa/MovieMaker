@@ -61,7 +61,8 @@ public static class TimelineEdgeDragBehavior
             return;
 
         var x = e.GetPosition(canvas).X;
-        var time = Math.Max(0, Math.Round(x / LayoutConstants.TimelinePixelsPerSecond / LayoutConstants.TimelineEdgeStepSeconds) * LayoutConstants.TimelineEdgeStepSeconds);
+        var pixelsPerSecond = TimelineScrubBehavior.GetPixelsPerSecond(canvas);
+        var time = Math.Max(0, Math.Round(x / pixelsPerSecond / LayoutConstants.TimelineEdgeStepSeconds) * LayoutConstants.TimelineEdgeStepSeconds);
 
         if (edge == TimelineEdge.Start)
             sceneObject.StartTime = time;

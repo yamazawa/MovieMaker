@@ -24,6 +24,11 @@ public static class TimelineScrubBehavior
         DependencyProperty.RegisterAttached("Duration", typeof(double), typeof(TimelineScrubBehavior),
             new PropertyMetadata(1.0));
 
+    // タイムラインの横方向の拡縮率(1秒あたりpx数)。ズーム操作で可変。
+    public static readonly DependencyProperty PixelsPerSecondProperty =
+        DependencyProperty.RegisterAttached("PixelsPerSecond", typeof(double), typeof(TimelineScrubBehavior),
+            new PropertyMetadata(LayoutConstants.TimelinePixelsPerSecond));
+
     public static void SetIsEnabled(DependencyObject element, bool value) => element.SetValue(IsEnabledProperty, value);
 
     public static bool GetIsEnabled(DependencyObject element) => (bool)element.GetValue(IsEnabledProperty);
@@ -35,6 +40,10 @@ public static class TimelineScrubBehavior
     public static void SetDuration(DependencyObject element, double value) => element.SetValue(DurationProperty, value);
 
     public static double GetDuration(DependencyObject element) => (double)element.GetValue(DurationProperty);
+
+    public static void SetPixelsPerSecond(DependencyObject element, double value) => element.SetValue(PixelsPerSecondProperty, value);
+
+    public static double GetPixelsPerSecond(DependencyObject element) => (double)element.GetValue(PixelsPerSecondProperty);
 
     private static void OnIsEnabledChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
@@ -83,7 +92,7 @@ public static class TimelineScrubBehavior
             return;
 
         var x = e.GetPosition(element).X;
-        var time = Math.Clamp(x / LayoutConstants.TimelinePixelsPerSecond, 0, duration);
+        var time = Math.Clamp(x / GetPixelsPerSecond(element), 0, duration);
         element.SetCurrentValue(CurrentTimeProperty, Math.Round(time, 1));
     }
 }

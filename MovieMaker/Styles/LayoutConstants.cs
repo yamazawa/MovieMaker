@@ -24,6 +24,10 @@ public static class LayoutConstants
     public const double TimelineHeight = 120;
     public const double DefaultDurationSeconds = 10.0;
 
+    // 動画全体の長さ(秒)の編集可能範囲。最大10分。
+    public const double MinDurationSeconds = 1.0;
+    public const double MaxDurationSeconds = 600.0;
+
     // Grid.ColumnDefinition.Width/RowDefinition.HeightはGridLength型のため、
     // double定数(PaletteWidth/TimelineHeight)とは別にGridLength版を用意する。
     public static readonly GridLength PaletteWidthGridLength = new(PaletteWidth);
@@ -38,9 +42,14 @@ public static class LayoutConstants
     // 表示時間は0.1秒単位。開始と終了の間に最低限確保する間隔。
     public const double TimeStepSeconds = 0.1;
 
-    // タイムライン(スライドバー兼タイミングチャート)。
+    // タイムライン(スライドバー兼タイミングチャート)。横(秒→px)・縦(行の高さ)それぞれ拡縮可能。
     public const double TimelinePixelsPerSecond = 80;
+    public const double TimelineZoomXMin = 10;
+    public const double TimelineZoomXMax = 400;
+
     public const double TimelineRowHeight = 24;
+    public const double TimelineZoomYMin = 12;
+    public const double TimelineZoomYMax = 80;
 
     // タイムラインバー端の開始/終了ドラッグハンドル幅(こちらは1秒単位で編集する)。
     public const double TimelineEdgeHandleWidth = 10;
