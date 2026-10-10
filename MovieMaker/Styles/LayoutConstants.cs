@@ -24,6 +24,11 @@ public static class LayoutConstants
     public const double TimelineHeight = 120;
     public const double DefaultDurationSeconds = 10.0;
 
+    // 中央(パレット+キャンバス)とタイムラインの境界(GridSplitter)。
+    public const double SplitterThickness = 6;
+    public const double ContentMinHeight = 200;
+    public const double TimelineMinHeight = 60;
+
     // 動画全体の長さ(秒)の編集可能範囲。最大10分。
     public const double MinDurationSeconds = 1.0;
     public const double MaxDurationSeconds = 600.0;
@@ -33,9 +38,10 @@ public static class LayoutConstants
     public static readonly GridLength PaletteWidthGridLength = new(PaletteWidth);
     public static readonly GridLength TimelineHeightGridLength = new(TimelineHeight);
 
-    // 新規オブジェクトの既定サイズ・配置。
+    // 新規オブジェクトの既定サイズ・配置・表示時間(現在時刻から何秒間表示するか)。
     public const double DefaultObjectWidth = 300;
     public const double DefaultObjectHeight = 100;
+    public const double DefaultObjectDurationSeconds = 4.0;
     public const double DefaultFontSize = 48;
     public const double MinFontSize = 8;
 

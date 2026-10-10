@@ -143,8 +143,8 @@ public partial class MainViewModel : ObservableObject
             y: (LayoutConstants.CanvasHeight - LayoutConstants.DefaultObjectHeight) / 2,
             width: LayoutConstants.DefaultObjectWidth,
             height: LayoutConstants.DefaultObjectHeight,
-            startTime: 0,
-            endTime: Duration)
+            startTime: CurrentTime,
+            endTime: CurrentTime + LayoutConstants.DefaultObjectDurationSeconds)
         {
             FontSize = LayoutConstants.DefaultFontSize,
         };
@@ -171,8 +171,8 @@ public partial class MainViewModel : ObservableObject
             y: (LayoutConstants.CanvasHeight - height) / 2,
             width: width,
             height: height,
-            startTime: 0,
-            endTime: Duration)
+            startTime: CurrentTime,
+            endTime: CurrentTime + LayoutConstants.DefaultObjectDurationSeconds)
         {
             ImageSource = image,
             ImageFileName = _imageAssetService.SaveImage(image),
