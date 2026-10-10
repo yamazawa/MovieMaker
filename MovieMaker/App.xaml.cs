@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using MovieMaker.Services;
 using MovieMaker.ViewModels;
 
 namespace MovieMaker;
@@ -14,7 +15,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        _viewModel = new MainViewModel();
+        var clipboardImageService = new ClipboardImageService();
+        _viewModel = new MainViewModel(clipboardImageService);
 
         var mainWindow = new MainWindow { DataContext = _viewModel };
         MainWindow = mainWindow;

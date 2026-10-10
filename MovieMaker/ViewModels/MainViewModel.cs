@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieMaker.Models;
+using MovieMaker.Services;
 using MovieMaker.Styles;
 
 namespace MovieMaker.ViewModels;
@@ -14,6 +15,13 @@ namespace MovieMaker.ViewModels;
 /// </summary>
 public partial class MainViewModel : ObservableObject
 {
+    private readonly ClipboardImageService _clipboardImageService;
+
+    public MainViewModel(ClipboardImageService clipboardImageService)
+    {
+        _clipboardImageService = clipboardImageService;
+    }
+
     [ObservableProperty]
     private AppMode _mode = AppMode.Create;
 
@@ -47,6 +55,34 @@ public partial class MainViewModel : ObservableObject
             endTime: Duration)
         {
             FontSize = LayoutConstants.DefaultFontSize,
+        };
+
+        Objects.Add(sceneObject);
+        SelectObject(sceneObject);
+    }
+
+    [RelayCommand]
+    private void AddImageFromClipboard()
+    {
+        if (!_clipboardImageService.TryGetImage(out var image) || image is null)
+            return;
+
+        var maxWidth = LayoutConstants.CanvasWidth * 0.6;
+        var maxHeight = LayoutConstants.CanvasHeight * 0.6;
+        var scale = Math.Min(1.0, Math.Min(maxWidth / image.PixelWidth, maxHeight / image.PixelHeight));
+        var width = image.PixelWidth * scale;
+        var height = image.PixelHeight * scale;
+
+        var sceneObject = new SceneObjectViewModel(
+            SceneObjectType.Image,
+            x: (LayoutConstants.CanvasWidth - width) / 2,
+            y: (LayoutConstants.CanvasHeight - height) / 2,
+            width: width,
+            height: height,
+            startTime: 0,
+            endTime: Duration)
+        {
+            ImageSource = image,
         };
 
         Objects.Add(sceneObject);
