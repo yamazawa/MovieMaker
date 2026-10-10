@@ -69,8 +69,9 @@
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="{x:Static styles:LayoutConstants.TimelineHeightGridLength}" />
+            <RowDefinition Height="*" MinHeight="{x:Static styles:LayoutConstants.ContentMinHeight}" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="{x:Static styles:LayoutConstants.TimelineHeightGridLength}" MinHeight="{x:Static styles:LayoutConstants.TimelineMinHeight}" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
@@ -90,10 +91,10 @@
                         Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                         Command="{Binding AddImageFromClipboardCommand}" />
 
-                <!-- 動画全体の長さ(1秒～10分)。 -->
+                <!-- 動画全体の長さ(1秒～10分)。入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
                 <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
                     <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                    <TextBox Text="{Binding Duration, StringFormat=F1}"
                              Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                 </StackPanel>
 
@@ -109,15 +110,16 @@
                                  AcceptsReturn="True" TextWrapping="Wrap"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                        <TextBox Text="{Binding SelectedObject.FontSize, UpdateSourceTrigger=PropertyChanged}"
+                        <TextBox Text="{Binding SelectedObject.FontSize}"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     </StackPanel>
 
+                    <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
                     <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding SelectedObject.StartTime, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                    <TextBox Text="{Binding SelectedObject.StartTime, StringFormat=F1}"
                              Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                    <TextBox Text="{Binding SelectedObject.EndTime, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                    <TextBox Text="{Binding SelectedObject.EndTime, StringFormat=F1}"
                              Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
 
                     <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
@@ -142,7 +144,12 @@
             </Viewbox>
         </Grid>
 
+        <!-- 中央とタイムラインの境界。ドラッグで表示割合を調整できる。 -->
+        <GridSplitter Grid.Row="1" Height="{x:Static styles:LayoutConstants.SplitterThickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Cursor="SizeNS" />
+
         <!-- 下部 : タイムライン(スライドバー兼タイミングチャート)。 -->
-        <views:TimelineControl Grid.Row="1" Margin="{x:Static styles:LayoutConstants.SectionSpacing}" />
+        <views:TimelineControl Grid.Row="2" Margin="{x:Static styles:LayoutConstants.SectionSpacing}" />
     </Grid>
 </UserControl>
