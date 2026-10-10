@@ -100,9 +100,12 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private SceneObjectViewModel? _selectedObject;
 
-    // サイズを揃える機能の基準オブジェクト。
+    // サイズを揃える機能の基準オブジェクトと、対象として選択中のオブジェクト数(パレット表示用)。
     [ObservableProperty]
     private SceneObjectViewModel? _alignBaseObject;
+
+    [ObservableProperty]
+    private int _alignTargetCount;
 
     public ObservableCollection<SceneObjectViewModel> Objects { get; } = [];
 
@@ -155,7 +158,7 @@ public partial class MainViewModel : ObservableObject
         };
 
         Objects.Add(sceneObject);
-        SelectObject(sceneObject);
+        SetSelectedObject(sceneObject);
     }
 
     [RelayCommand]
@@ -209,16 +212,33 @@ public partial class MainViewModel : ObservableObject
         };
 
         Objects.Add(sceneObject);
-        SelectObject(sceneObject);
+        SetSelectedObject(sceneObject);
     }
 
-    [RelayCommand]
-    private void SelectObject(SceneObjectViewModel sceneObject)
+    // クリック選択の共通処理。サイズ揃えの基準選択中(AlignBaseObjectがある間)はSelectObjectCommand側で分岐するため、
+    // 新規追加時の自動選択など、通常の単一選択が必要な箇所はこちらを直接呼ぶ。
+    private void SetSelectedObject(SceneObjectViewModel sceneObject)
     {
         foreach (var obj in Objects)
             obj.IsSelected = obj == sceneObject;
 
         SelectedObject = sceneObject;
+    }
+
+    // キャンバス/タイムラインのブロッククリックで呼ばれる。
+    // サイズ揃えの基準(AlignBaseObject)を選択中は、クリックしたブロックを対象(IsAlignTarget)に追加/除外する。
+    [RelayCommand]
+    private void SelectObject(SceneObjectViewModel sceneObject)
+    {
+        if (AlignBaseObject is not null)
+        {
+            if (sceneObject != AlignBaseObject)
+                sceneObject.IsAlignTarget = !sceneObject.IsAlignTarget;
+
+            return;
+        }
+
+        SetSelectedObject(sceneObject);
     }
 
     [RelayCommand]
@@ -248,10 +268,21 @@ public partial class MainViewModel : ObservableObject
 
         foreach (var obj in Objects.Where(obj => obj.IsAlignTarget && obj != baseObject))
         {
+            obj.X = baseObject.X;
+            obj.Y = baseObject.Y;
             obj.Width = baseObject.Width;
             obj.Height = baseObject.Height;
             obj.IsAlignTarget = false;
         }
+
+        AlignBaseObject = null;
+    }
+
+    [RelayCommand]
+    private void CancelAlign()
+    {
+        foreach (var obj in Objects.Where(obj => obj.IsAlignTarget))
+            obj.IsAlignTarget = false;
 
         AlignBaseObject = null;
     }
@@ -307,6 +338,9 @@ public partial class MainViewModel : ObservableObject
     {
         if (e.PropertyName is nameof(SceneObjectViewModel.StartTime) or nameof(SceneObjectViewModel.EndTime))
             RefreshVisibleObjects();
+
+        if (e.PropertyName == nameof(SceneObjectViewModel.IsAlignTarget))
+            AlignTargetCount = Objects.Count(obj => obj.IsAlignTarget);
 
         MarkDirty();
     }
