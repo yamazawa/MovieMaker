@@ -90,6 +90,13 @@
                         Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                         Command="{Binding AddImageFromClipboardCommand}" />
 
+                <!-- 動画全体の長さ(1秒～10分)。 -->
+                <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                    <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <TextBox Text="{Binding Duration, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                </StackPanel>
+
                 <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
                 <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
                             Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">

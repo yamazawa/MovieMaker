@@ -163,5 +163,32 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_DeleteSelected", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   動画の長さ(秒) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_Duration {
+            get {
+                return ResourceManager.GetString("Label_Duration", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   タイムライン拡大(横) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_TimelineZoomX {
+            get {
+                return ResourceManager.GetString("Label_TimelineZoomX", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   タイムライン拡大(縦) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_TimelineZoomY {
+            get {
+                return ResourceManager.GetString("Label_TimelineZoomY", resourceCulture);
+            }
+        }
     }
 }

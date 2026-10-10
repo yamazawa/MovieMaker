@@ -94,4 +94,13 @@
   <data name="Button_DeleteSelected" xml:space="preserve">
     <value>削除</value>
   </data>
+  <data name="Label_Duration" xml:space="preserve">
+    <value>動画の長さ(秒)</value>
+  </data>
+  <data name="Label_TimelineZoomX" xml:space="preserve">
+    <value>タイムライン拡大(横)</value>
+  </data>
+  <data name="Label_TimelineZoomY" xml:space="preserve">
+    <value>タイムライン拡大(縦)</value>
+  </data>
 </root>
