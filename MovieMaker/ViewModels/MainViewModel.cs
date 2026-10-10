@@ -100,6 +100,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private SceneObjectViewModel? _selectedObject;
 
+    // サイズを揃える機能の基準オブジェクト。
+    [ObservableProperty]
+    private SceneObjectViewModel? _alignBaseObject;
+
     public ObservableCollection<SceneObjectViewModel> Objects { get; } = [];
 
     // 現在時刻に表示範囲が重なるオブジェクトのみ。キャンバスの表示にバインドする。
@@ -225,6 +229,31 @@ public partial class MainViewModel : ObservableObject
 
         Objects.Remove(SelectedObject);
         SelectedObject = null;
+    }
+
+    [RelayCommand]
+    private void SetAlignBase()
+    {
+        if (SelectedObject is null)
+            return;
+
+        AlignBaseObject = SelectedObject;
+    }
+
+    [RelayCommand]
+    private void ConfirmAlignSizes()
+    {
+        if (AlignBaseObject is not { } baseObject)
+            return;
+
+        foreach (var obj in Objects.Where(obj => obj.IsAlignTarget && obj != baseObject))
+        {
+            obj.Width = baseObject.Width;
+            obj.Height = baseObject.Height;
+            obj.IsAlignTarget = false;
+        }
+
+        AlignBaseObject = null;
     }
 
     partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
