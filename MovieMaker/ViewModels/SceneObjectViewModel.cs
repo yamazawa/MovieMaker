@@ -1,6 +1,7 @@
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieMaker.Models;
+using MovieMaker.Services;
 using MovieMaker.Styles;
 
 namespace MovieMaker.ViewModels;
@@ -12,9 +13,12 @@ namespace MovieMaker.ViewModels;
 /// </summary>
 public partial class SceneObjectViewModel : ObservableObject
 {
-    public Guid Id { get; } = Guid.NewGuid();
+    public Guid Id { get; }
 
     public SceneObjectType Type { get; }
+
+    // 画像オブジェクトの保存ファイル名(assetsフォルダ内)。文字オブジェクトではnull。
+    public string? ImageFileName { get; set; }
 
     [ObservableProperty]
     private double _x;
@@ -49,8 +53,9 @@ public partial class SceneObjectViewModel : ObservableObject
     // タイムライン上の表示区間バーの幅に使う(StartTime/EndTimeから算出)。
     public double DurationSeconds => EndTime - StartTime;
 
-    public SceneObjectViewModel(SceneObjectType type, double x, double y, double width, double height, double startTime, double endTime)
+    public SceneObjectViewModel(SceneObjectType type, double x, double y, double width, double height, double startTime, double endTime, Guid? id = null)
     {
+        Id = id ?? Guid.NewGuid();
         Type = type;
         _x = x;
         _y = y;
@@ -59,6 +64,23 @@ public partial class SceneObjectViewModel : ObservableObject
         _startTime = startTime;
         _endTime = endTime;
     }
+
+    public static SceneObjectViewModel FromModel(SceneObject model, ImageAssetService imageAssetService)
+    {
+        var vm = new SceneObjectViewModel(model.Type, model.X, model.Y, model.Width, model.Height, model.StartTime, model.EndTime, model.Id)
+        {
+            Text = model.Text,
+            FontSize = model.FontSize,
+            ImageFileName = model.ImageFileName,
+        };
+
+        if (model.Type == SceneObjectType.Image && model.ImageFileName is not null)
+            vm.ImageSource = imageAssetService.LoadImage(model.ImageFileName);
+
+        return vm;
+    }
+
+    public SceneObject ToModel() => new(Id, Type, X, Y, Width, Height, StartTime, EndTime, Text, FontSize, ImageFileName);
 
     // 表示時間は0.1秒単位に丸め、開始<終了・0秒以上を保つ。
     partial void OnStartTimeChanged(double value)
