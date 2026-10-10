@@ -24,6 +24,11 @@ public static class LayoutConstants
     public const double TimelineHeight = 120;
     public const double DefaultDurationSeconds = 10.0;
 
+    // Grid.ColumnDefinition.Width/RowDefinition.HeightはGridLength型のため、
+    // double定数(PaletteWidth/TimelineHeight)とは別にGridLength版を用意する。
+    public static readonly GridLength PaletteWidthGridLength = new(PaletteWidth);
+    public static readonly GridLength TimelineHeightGridLength = new(TimelineHeight);
+
     public static readonly Thickness RootMargin = new(8);
     public static readonly Thickness SectionSpacing = new(4);
     public static readonly Thickness FieldSpacing = new(0, 0, 0, 4);
