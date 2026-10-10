@@ -8,10 +8,39 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
+        <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
+
+        <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X}" />
+            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+        </Style>
+
+        <!-- 編集用の枠・ハンドルは付けず、内容(文字/画像)のみを表示する。 -->
+        <DataTemplate x:Key="ObjectTemplate">
+            <Grid Width="{Binding Width}" Height="{Binding Height}">
+                <TextBlock Text="{Binding Text}" FontSize="{Binding FontSize}"
+                           Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}" />
+                <Image Source="{Binding ImageSource}" Stretch="Fill"
+                       Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Image}" />
+            </Grid>
+        </DataTemplate>
     </UserControl.Resources>
-    <!-- キャンバスのみをフル表示する。ループ再生の本実装・配置オブジェクトの表示はタスク7で追加する。 -->
+
+    <!-- キャンバスのみをフル表示する。ループ再生の時刻更新はMainViewModelが行う。 -->
     <Viewbox Stretch="Uniform">
-        <Border Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}"
-                Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+        <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
+            <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+            <ItemsControl Background="Transparent" IsHitTestVisible="False"
+                          ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
+                          ItemContainerStyle="{StaticResource ObjectContainerStyle}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas IsItemsHost="True" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
     </Viewbox>
 </UserControl>
