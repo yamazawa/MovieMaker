@@ -91,5 +91,14 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Header_Palette", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   文字を追加 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_AddText {
+            get {
+                return ResourceManager.GetString("Button_AddText", resourceCulture);
+            }
+        }
     }
 }

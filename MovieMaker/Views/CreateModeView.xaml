@@ -6,9 +6,60 @@
              xmlns:styles="clr-namespace:MovieMaker.Styles"
              xmlns:resx="clr-namespace:MovieMaker.Resources"
              xmlns:conv="clr-namespace:MovieMaker.Converters"
+             xmlns:behaviors="clr-namespace:MovieMaker.Behaviors"
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
+        <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
+
+        <!-- オブジェクト一覧はCanvas上に配置するため、ItemsPanelをCanvasにし、Canvas.Left/TopをX/Yへ双方向バインドする。 -->
+        <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
+            <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
+        </Style>
+
+        <DataTemplate x:Key="ObjectTemplate">
+            <Border Width="{Binding Width, Mode=TwoWay}" Height="{Binding Height, Mode=TwoWay}"
+                    BorderBrush="{Binding IsSelected, Converter={StaticResource SelectionBrushConverter}}"
+                    BorderThickness="2" Background="Transparent" Cursor="SizeAll"
+                    behaviors:DragMoveBehavior.IsEnabled="True"
+                    behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.RowSpan="3" Grid.ColumnSpan="3" Text="{Binding Text}" FontSize="{Binding FontSize}"
+                               Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+
+                    <!-- 4隅・4辺のドラッグ可能なリサイズ領域。表示なし(Transparent)、元矩形より少し外側にはみ出す。 -->
+                    <Rectangle Grid.Row="0" Grid.Column="0" Margin="-5,-5,0,0" Fill="Transparent" Cursor="SizeNWSE"
+                               behaviors:ResizeHandleBehavior.Direction="TopLeft" />
+                    <Rectangle Grid.Row="0" Grid.Column="1" Margin="0,-5,0,0" Fill="Transparent" Cursor="SizeNS"
+                               behaviors:ResizeHandleBehavior.Direction="Top" />
+                    <Rectangle Grid.Row="0" Grid.Column="2" Margin="0,-5,-5,0" Fill="Transparent" Cursor="SizeNESW"
+                               behaviors:ResizeHandleBehavior.Direction="TopRight" />
+                    <Rectangle Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" Fill="Transparent" Cursor="SizeWE"
+                               behaviors:ResizeHandleBehavior.Direction="Left" />
+                    <Rectangle Grid.Row="1" Grid.Column="2" Margin="0,0,-5,0" Fill="Transparent" Cursor="SizeWE"
+                               behaviors:ResizeHandleBehavior.Direction="Right" />
+                    <Rectangle Grid.Row="2" Grid.Column="0" Margin="-5,0,0,-5" Fill="Transparent" Cursor="SizeNESW"
+                               behaviors:ResizeHandleBehavior.Direction="BottomLeft" />
+                    <Rectangle Grid.Row="2" Grid.Column="1" Margin="0,0,0,-5" Fill="Transparent" Cursor="SizeNS"
+                               behaviors:ResizeHandleBehavior.Direction="Bottom" />
+                    <Rectangle Grid.Row="2" Grid.Column="2" Margin="0,0,-5,-5" Fill="Transparent" Cursor="SizeNWSE"
+                               behaviors:ResizeHandleBehavior.Direction="BottomRight" />
+                </Grid>
+            </Border>
+        </DataTemplate>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -22,16 +73,28 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- 左 : 編集パレット。オブジェクトの追加・選択中オブジェクトの編集項目はタスク2以降で追加する。 -->
+            <!-- 左 : 編集パレット。選択中オブジェクトの編集項目はタスク4で追加する。 -->
             <DockPanel Grid.Column="0" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
                 <TextBlock DockPanel.Dock="Top" Text="{x:Static resx:Strings.Header_Palette}"
                            FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddText}"
+                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                        Command="{Binding AddTextCommand}" />
             </DockPanel>
 
-            <!-- 中央 : キャンバス(動画本体)。配置済みオブジェクトの表示はタスク2以降で追加する。 -->
+            <!-- 中央 : キャンバス(動画本体)。画像オブジェクトの追加はタスク3で追加する。 -->
             <Viewbox Grid.Column="1" Stretch="Uniform" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
-                <Border Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}"
-                        Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+                <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
+                    <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+                    <ItemsControl Background="Transparent" ItemsSource="{Binding Objects}" ItemTemplate="{StaticResource ObjectTemplate}"
+                                  ItemContainerStyle="{StaticResource ObjectContainerStyle}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas IsItemsHost="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
             </Viewbox>
         </Grid>
 

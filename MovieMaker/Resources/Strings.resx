@@ -70,4 +70,7 @@
   <data name="Header_Palette" xml:space="preserve">
     <value>編集パレット</value>
   </data>
+  <data name="Button_AddText" xml:space="preserve">
+    <value>文字を追加</value>
+  </data>
 </root>
