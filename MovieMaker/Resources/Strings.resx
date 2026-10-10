@@ -112,10 +112,16 @@
   <data name="Label_AlignBase" xml:space="preserve">
     <value>基準</value>
   </data>
-  <data name="Label_AlignTargets" xml:space="preserve">
-    <value>揃えたいオブジェクト</value>
+  <data name="Hint_AlignSelectTargets" xml:space="preserve">
+    <value>タイムラインまたはキャンバス上のブロックをクリックして、揃えたいオブジェクトを選択してください</value>
+  </data>
+  <data name="Label_AlignTargetCount" xml:space="preserve">
+    <value>選択中: </value>
   </data>
   <data name="Button_ConfirmAlignSizes" xml:space="preserve">
     <value>確定</value>
+  </data>
+  <data name="Button_CancelAlign" xml:space="preserve">
+    <value>キャンセル</value>
   </data>
 </root>

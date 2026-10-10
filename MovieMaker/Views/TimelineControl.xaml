@@ -11,7 +11,7 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:MultiplyConverter x:Key="MultiplyConverter" />
-        <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
+        <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
 
         <!--
             タイムチャート内のオブジェクトは開始時刻の昇順で並べる(表示用の並び替えのみで、Objects本体の順序は変えない)。
@@ -47,10 +47,15 @@
         <!-- クリックで選択、バー本体のドラッグで長さを保ったまま左右移動、左右端のドラッグで表示開始/終了時刻を編集できる(いずれも1秒単位)。 -->
         <DataTemplate x:Key="BarTemplate">
             <Border Height="{Binding DataContext.TimelineRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Background="SteelBlue" CornerRadius="2" Cursor="SizeWE"
-                    BorderThickness="2" BorderBrush="{Binding IsSelected, Converter={StaticResource SelectionBrushConverter}}"
+                    Background="SteelBlue" CornerRadius="2" Cursor="SizeWE" BorderThickness="2"
                     behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     behaviors:TimelineBarMoveBehavior.IsEnabled="True">
+                <Border.BorderBrush>
+                    <MultiBinding Converter="{StaticResource AlignStateBrushConverter}">
+                        <Binding Path="IsSelected" />
+                        <Binding Path="IsAlignTarget" />
+                    </MultiBinding>
+                </Border.BorderBrush>
                 <Border.Width>
                     <MultiBinding Converter="{StaticResource MultiplyConverter}">
                         <Binding Path="DurationSeconds" />

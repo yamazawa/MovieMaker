@@ -219,11 +219,20 @@ namespace MovieMaker.Resources {
         }
 
         /// <summary>
-        ///   揃えたいオブジェクト に類似しているローカライズされた文字列を検索します。
+        ///   タイムラインまたはキャンバス上のブロックをクリックして、揃えたいオブジェクトを選択してください に類似しているローカライズされた文字列を検索します。
         /// </summary>
-        public static string Label_AlignTargets {
+        public static string Hint_AlignSelectTargets {
             get {
-                return ResourceManager.GetString("Label_AlignTargets", resourceCulture);
+                return ResourceManager.GetString("Hint_AlignSelectTargets", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   選択中:  に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_AlignTargetCount {
+            get {
+                return ResourceManager.GetString("Label_AlignTargetCount", resourceCulture);
             }
         }
 
@@ -233,6 +242,15 @@ namespace MovieMaker.Resources {
         public static string Button_ConfirmAlignSizes {
             get {
                 return ResourceManager.GetString("Button_ConfirmAlignSizes", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   キャンセル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_CancelAlign {
+            get {
+                return ResourceManager.GetString("Button_CancelAlign", resourceCulture);
             }
         }
     }

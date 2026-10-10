@@ -11,7 +11,7 @@
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
-        <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
+        <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
         <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
@@ -23,10 +23,15 @@
 
         <DataTemplate x:Key="ObjectTemplate">
             <Border Width="{Binding Width, Mode=TwoWay}" Height="{Binding Height, Mode=TwoWay}"
-                    BorderBrush="{Binding IsSelected, Converter={StaticResource SelectionBrushConverter}}"
                     BorderThickness="2" Background="Transparent" Cursor="SizeAll"
                     behaviors:DragMoveBehavior.IsEnabled="True"
                     behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                <Border.BorderBrush>
+                    <MultiBinding Converter="{StaticResource AlignStateBrushConverter}">
+                        <Binding Path="IsSelected" />
+                        <Binding Path="IsAlignTarget" />
+                    </MultiBinding>
+                </Border.BorderBrush>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
@@ -128,7 +133,7 @@
                                 Command="{Binding DeleteSelectedCommand}" />
                     </StackPanel>
 
-                    <!-- サイズを揃える。①基準に設定 → ②対象をチェック → ③確定で、対象の幅高さを基準に揃える。 -->
+                    <!-- サイズを揃える。①基準に設定 → ②タイムライン/キャンバス上のブロックをクリックして対象を選択 → ③確定で、対象の位置・幅・高さを基準に揃える。 -->
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
                         <TextBlock Text="{x:Static resx:Strings.Header_AlignSizes}"
                                    FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
@@ -143,18 +148,20 @@
                                 <Run Text=": " />
                                 <Run Text="{Binding AlignBaseObject.DisplayLabel, Mode=OneWay}" />
                             </TextBlock>
-                            <TextBlock Text="{x:Static resx:Strings.Label_AlignTargets}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                            <ItemsControl ItemsSource="{Binding Objects}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <CheckBox Content="{Binding DisplayLabel}" IsChecked="{Binding IsAlignTarget}"
-                                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <Button Content="{x:Static resx:Strings.Button_ConfirmAlignSizes}"
-                                    HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
-                                    Command="{Binding ConfirmAlignSizesCommand}" />
+                            <TextBlock TextWrapping="Wrap" Opacity="0.7" Margin="{x:Static styles:LayoutConstants.FieldSpacing}"
+                                       Text="{x:Static resx:Strings.Hint_AlignSelectTargets}" />
+                            <TextBlock Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
+                                <Run Text="{x:Static resx:Strings.Label_AlignTargetCount}" />
+                                <Run Text="{Binding AlignTargetCount, Mode=OneWay}" />
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{x:Static resx:Strings.Button_ConfirmAlignSizes}"
+                                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                        Command="{Binding ConfirmAlignSizesCommand}" />
+                                <Button Content="{x:Static resx:Strings.Button_CancelAlign}"
+                                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                        Command="{Binding CancelAlignCommand}" />
+                            </StackPanel>
                         </StackPanel>
                     </StackPanel>
                 </StackPanel>
