@@ -109,5 +109,59 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_AddImage", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   選択中オブジェクト に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Header_ObjectProperties {
+            get {
+                return ResourceManager.GetString("Header_ObjectProperties", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   文字内容 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_Text {
+            get {
+                return ResourceManager.GetString("Label_Text", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   文字サイズ に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_FontSize {
+            get {
+                return ResourceManager.GetString("Label_FontSize", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   表示開始(秒) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_StartTime {
+            get {
+                return ResourceManager.GetString("Label_StartTime", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   表示終了(秒) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_EndTime {
+            get {
+                return ResourceManager.GetString("Label_EndTime", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   削除 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_DeleteSelected {
+            get {
+                return ResourceManager.GetString("Button_DeleteSelected", resourceCulture);
+            }
+        }
     }
 }

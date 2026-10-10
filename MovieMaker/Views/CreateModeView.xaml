@@ -12,6 +12,7 @@
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
         <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
         <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
         <!-- オブジェクト一覧はCanvas上に配置するため、ItemsPanelをCanvasにし、Canvas.Left/TopをX/Yへ双方向バインドする。 -->
         <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
@@ -87,6 +88,34 @@
                 <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddImage}"
                         Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                         Command="{Binding AddImageFromClipboardCommand}" />
+
+                <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
+                <StackPanel DockPanel.Dock="Top" Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
+                            Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">
+                    <TextBlock Text="{x:Static resx:Strings.Header_ObjectProperties}"
+                               FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+
+                    <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}">
+                        <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.Text, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" TextWrapping="Wrap"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.FontSize, UpdateSourceTrigger=PropertyChanged}"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    </StackPanel>
+
+                    <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <TextBox Text="{Binding SelectedObject.StartTime, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <TextBox Text="{Binding SelectedObject.EndTime, UpdateSourceTrigger=PropertyChanged, StringFormat=F1}"
+                             Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+
+                    <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
+                            HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding DeleteSelectedCommand}" />
+                </StackPanel>
             </DockPanel>
 
             <!-- 中央 : キャンバス(動画本体)。画像オブジェクトの追加はタスク3で追加する。 -->

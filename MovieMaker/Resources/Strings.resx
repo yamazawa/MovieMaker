@@ -76,4 +76,22 @@
   <data name="Button_AddImage" xml:space="preserve">
     <value>画像を追加(クリップボードから)</value>
   </data>
+  <data name="Header_ObjectProperties" xml:space="preserve">
+    <value>選択中オブジェクト</value>
+  </data>
+  <data name="Label_Text" xml:space="preserve">
+    <value>文字内容</value>
+  </data>
+  <data name="Label_FontSize" xml:space="preserve">
+    <value>文字サイズ</value>
+  </data>
+  <data name="Label_StartTime" xml:space="preserve">
+    <value>表示開始(秒)</value>
+  </data>
+  <data name="Label_EndTime" xml:space="preserve">
+    <value>表示終了(秒)</value>
+  </data>
+  <data name="Button_DeleteSelected" xml:space="preserve">
+    <value>削除</value>
+  </data>
 </root>
