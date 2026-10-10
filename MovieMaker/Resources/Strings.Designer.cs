@@ -253,5 +253,14 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_CancelAlign", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   並べ替え に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_SortObjects {
+            get {
+                return ResourceManager.GetString("Button_SortObjects", resourceCulture);
+            }
+        }
     }
 }

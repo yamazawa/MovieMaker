@@ -124,4 +124,7 @@
   <data name="Button_CancelAlign" xml:space="preserve">
     <value>キャンセル</value>
   </data>
+  <data name="Button_SortObjects" xml:space="preserve">
+    <value>並べ替え</value>
+  </data>
 </root>

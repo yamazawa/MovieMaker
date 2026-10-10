@@ -7,22 +7,15 @@
              xmlns:resx="clr-namespace:MovieMaker.Resources"
              xmlns:conv="clr-namespace:MovieMaker.Converters"
              xmlns:behaviors="clr-namespace:MovieMaker.Behaviors"
-             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d">
     <UserControl.Resources>
         <conv:MultiplyConverter x:Key="MultiplyConverter" />
         <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
 
         <!--
-            タイムチャート内のオブジェクトは開始時刻の昇順で並べる(表示用の並び替えのみで、Objects本体の順序は変えない)。
-            ライブソートはドラッグ中に並び替わって操作しづらくなるため使わず、
-            各ドラッグ系ビヘイビアがドラッグ完了時にTimelineSortHelperでRefreshする。
+            タイムチャート内のオブジェクトの表示順はMainViewModel.Objectsの並び順そのもの。
+            バー本体の縦ドラッグ、または「並べ替え」ボタン(SortObjectsCommand)で順序を変更する。
         -->
-        <CollectionViewSource x:Key="SortedObjects" Source="{Binding Objects}">
-            <CollectionViewSource.SortDescriptions>
-                <scm:SortDescription PropertyName="StartTime" Direction="Ascending" />
-            </CollectionViewSource.SortDescriptions>
-        </CollectionViewSource>
 
         <!-- オブジェクトごとに1行を割り当て、重ならないよう縦に積む。行の高さは縦方向の拡縮に応じて変わる。 -->
         <Style x:Key="BarContainerStyle" TargetType="ContentPresenter">
@@ -48,7 +41,7 @@
         <DataTemplate x:Key="BarTemplate">
             <Border Height="{Binding DataContext.TimelineRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
                     Background="SteelBlue" CornerRadius="2" Cursor="SizeWE" BorderThickness="2"
-                    behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                    behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectTimelineObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     behaviors:TimelineBarMoveBehavior.IsEnabled="True">
                 <Border.BorderBrush>
                     <MultiBinding Converter="{StaticResource AlignStateBrushConverter}">
@@ -92,6 +85,8 @@
             <Slider Width="120" VerticalAlignment="Center"
                     Minimum="{x:Static styles:LayoutConstants.TimelineZoomYMin}" Maximum="{x:Static styles:LayoutConstants.TimelineZoomYMax}"
                     Value="{Binding TimelineRowHeight}" />
+            <Button Content="{x:Static resx:Strings.Button_SortObjects}" VerticalAlignment="Center"
+                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}" Command="{Binding SortObjectsCommand}" />
         </StackPanel>
 
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
@@ -113,7 +108,7 @@
                     </MultiBinding>
                 </Canvas.Height>
 
-                <ItemsControl ItemsSource="{Binding Source={StaticResource SortedObjects}}" ItemTemplate="{StaticResource BarTemplate}"
+                <ItemsControl ItemsSource="{Binding Objects}" ItemTemplate="{StaticResource BarTemplate}"
                               ItemContainerStyle="{StaticResource BarContainerStyle}" AlternationCount="1000">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
