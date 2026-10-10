@@ -7,7 +7,7 @@ namespace MovieMaker.Behaviors;
 /// <summary>
 /// タイムライン上のクリック・ドラッグ位置を現在時刻に変換する添付ビヘイビア(スライドバー本体)
 ///
-/// クリックした瞬間から時刻を移動し、ドラッグ中も追従する。
+/// クリックした瞬間から時刻を移動し、ドラッグ中も追従する。1秒単位に丸めて反映する。
 /// SetCurrentValueで書き込むため、宣言済みの{Binding}を破壊せずに時刻を反映できる。
 /// </summary>
 public static class TimelineScrubBehavior
@@ -93,6 +93,6 @@ public static class TimelineScrubBehavior
 
         var x = e.GetPosition(element).X;
         var time = Math.Clamp(x / GetPixelsPerSecond(element), 0, duration);
-        element.SetCurrentValue(CurrentTimeProperty, Math.Round(time, 1));
+        element.SetCurrentValue(CurrentTimeProperty, Math.Round(time / LayoutConstants.TimelineScrubStepSeconds) * LayoutConstants.TimelineScrubStepSeconds);
     }
 }

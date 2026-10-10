@@ -55,6 +55,10 @@ public static class LayoutConstants
     public const double TimelineZoomYMin = 12;
     public const double TimelineZoomYMax = 80;
 
+    // タイムラインのクリック・ドラッグによる現在時刻の移動は1秒単位(0.1秒単位では細かすぎて
+    // 特定の秒数ちょうどへ移動しづらいため)。
+    public const double TimelineScrubStepSeconds = 1.0;
+
     // タイムラインバー端の開始/終了ドラッグハンドル幅(こちらは1秒単位で編集する)。
     public const double TimelineEdgeHandleWidth = 10;
     public static readonly GridLength TimelineEdgeHandleGridLength = new(TimelineEdgeHandleWidth);
