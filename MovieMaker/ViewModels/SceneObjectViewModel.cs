@@ -1,6 +1,7 @@
 using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieMaker.Models;
+using MovieMaker.Styles;
 
 namespace MovieMaker.ViewModels;
 
@@ -54,5 +55,27 @@ public partial class SceneObjectViewModel : ObservableObject
         _height = height;
         _startTime = startTime;
         _endTime = endTime;
+    }
+
+    // 表示時間は0.1秒単位に丸め、開始<終了・0秒以上を保つ。
+    partial void OnStartTimeChanged(double value)
+    {
+        var clamped = Math.Round(Math.Max(0, Math.Min(value, EndTime - LayoutConstants.TimeStepSeconds)), 1);
+        if (clamped != value)
+            StartTime = clamped;
+    }
+
+    partial void OnEndTimeChanged(double value)
+    {
+        var clamped = Math.Round(Math.Max(value, StartTime + LayoutConstants.TimeStepSeconds), 1);
+        if (clamped != value)
+            EndTime = clamped;
+    }
+
+    partial void OnFontSizeChanged(double value)
+    {
+        var clamped = Math.Max(LayoutConstants.MinFontSize, value);
+        if (clamped != value)
+            FontSize = clamped;
     }
 }

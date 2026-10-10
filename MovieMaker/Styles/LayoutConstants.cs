@@ -28,6 +28,10 @@ public static class LayoutConstants
     public const double DefaultObjectWidth = 300;
     public const double DefaultObjectHeight = 100;
     public const double DefaultFontSize = 48;
+    public const double MinFontSize = 8;
+
+    // 表示時間は0.1秒単位。開始と終了の間に最低限確保する間隔。
+    public const double TimeStepSeconds = 0.1;
 
     // リサイズハンドルの表示サイズ(枠からのはみ出し量)。
     public const double ResizeHandleSize = 20;
