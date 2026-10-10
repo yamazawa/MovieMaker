@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
         <conv:SelectionBrushConverter x:Key="SelectionBrushConverter" />
+        <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
 
         <!-- オブジェクト一覧はCanvas上に配置するため、ItemsPanelをCanvasにし、Canvas.Left/TopをX/Yへ双方向バインドする。 -->
         <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
@@ -38,7 +39,10 @@
 
                     <TextBlock Grid.RowSpan="3" Grid.ColumnSpan="3" Text="{Binding Text}" FontSize="{Binding FontSize}"
                                Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False" />
+                               HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                               Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}" />
+                    <Image Grid.RowSpan="3" Grid.ColumnSpan="3" Source="{Binding ImageSource}" Stretch="Fill" IsHitTestVisible="False"
+                           Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Image}" />
 
                     <!-- 4隅・4辺のドラッグ可能なリサイズ領域。表示なし(Transparent)、元矩形より少し外側にはみ出す。 -->
                     <Rectangle Grid.Row="0" Grid.Column="0" Margin="-5,-5,0,0" Fill="Transparent" Cursor="SizeNWSE"
@@ -80,6 +84,9 @@
                 <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddText}"
                         Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                         Command="{Binding AddTextCommand}" />
+                <Button DockPanel.Dock="Top" Content="{x:Static resx:Strings.Button_AddImage}"
+                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                        Command="{Binding AddImageFromClipboardCommand}" />
             </DockPanel>
 
             <!-- 中央 : キャンバス(動画本体)。画像オブジェクトの追加はタスク3で追加する。 -->

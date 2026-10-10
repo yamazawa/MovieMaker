@@ -73,4 +73,7 @@
   <data name="Button_AddText" xml:space="preserve">
     <value>文字を追加</value>
   </data>
+  <data name="Button_AddImage" xml:space="preserve">
+    <value>画像を追加(クリップボードから)</value>
+  </data>
 </root>

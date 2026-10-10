@@ -100,5 +100,14 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_AddText", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   画像を追加(クリップボードから) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_AddImage {
+            get {
+                return ResourceManager.GetString("Button_AddImage", resourceCulture);
+            }
+        }
     }
 }
