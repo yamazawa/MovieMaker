@@ -1,3 +1,4 @@
+using System.Windows.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using MovieMaker.Models;
 
@@ -37,6 +38,9 @@ public partial class SceneObjectViewModel : ObservableObject
 
     [ObservableProperty]
     private double _fontSize;
+
+    [ObservableProperty]
+    private BitmapSource? _imageSource;
 
     [ObservableProperty]
     private bool _isSelected;

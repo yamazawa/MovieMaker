@@ -6,4 +6,5 @@ namespace MovieMaker.Models;
 public enum SceneObjectType
 {
     Text,
+    Image,
 }
