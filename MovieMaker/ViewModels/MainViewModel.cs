@@ -106,12 +106,11 @@ public partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void ToggleMode() => Mode = Mode == AppMode.Create ? AppMode.Play : AppMode.Create;
 
-    // 再生モードに入ったら時刻0からループ再生を開始し、作成モードに戻ったら停止する。
+    // モード切替時、現在時刻は引き継ぐ(作成モードの再生位置から再生開始し、作成モードに戻った時もその時刻のまま)。
     partial void OnModeChanged(AppMode value)
     {
         if (value == AppMode.Play)
         {
-            CurrentTime = 0;
             _lastPlaybackTick = DateTime.UtcNow;
             _playbackTimer.Start();
         }

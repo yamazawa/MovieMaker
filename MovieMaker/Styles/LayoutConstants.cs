@@ -18,7 +18,7 @@ public static class LayoutConstants
     // キャンバス(動画本体)の固定サイズ。
     public const double CanvasWidth = 1280;
     public const double CanvasHeight = 720;
-    public const string DefaultBackgroundColorHex = "#FF202020";
+    public const string DefaultBackgroundColorHex = "#FF000000";
 
     public const double PaletteWidth = 240;
     public const double TimelineHeight = 120;
