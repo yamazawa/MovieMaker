@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieMaker.Models;
@@ -21,10 +22,12 @@ public partial class MainViewModel : ObservableObject
     private readonly ClipboardImageService _clipboardImageService;
     private readonly ImageAssetService _imageAssetService;
     private readonly MovieProjectService _movieProjectService;
+    private readonly DispatcherTimer _playbackTimer;
 
     // 復元中はユーザー操作ではないため、MarkDirtyを抑制するためのガード。
     private bool _isRestoring;
     private bool _isDirty;
+    private DateTime _lastPlaybackTick;
 
     public MainViewModel(ClipboardImageService clipboardImageService, ImageAssetService imageAssetService, MovieProjectService movieProjectService)
     {
@@ -32,6 +35,9 @@ public partial class MainViewModel : ObservableObject
         _imageAssetService = imageAssetService;
         _movieProjectService = movieProjectService;
         Objects.CollectionChanged += OnObjectsChanged;
+
+        _playbackTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(LayoutConstants.PlaybackFrameIntervalMilliseconds) };
+        _playbackTimer.Tick += OnPlaybackTick;
 
         LoadProject();
     }
@@ -92,6 +98,34 @@ public partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleMode() => Mode = Mode == AppMode.Create ? AppMode.Play : AppMode.Create;
+
+    // 再生モードに入ったら時刻0からループ再生を開始し、作成モードに戻ったら停止する。
+    partial void OnModeChanged(AppMode value)
+    {
+        if (value == AppMode.Play)
+        {
+            CurrentTime = 0;
+            _lastPlaybackTick = DateTime.UtcNow;
+            _playbackTimer.Start();
+        }
+        else
+        {
+            _playbackTimer.Stop();
+        }
+    }
+
+    private void OnPlaybackTick(object? sender, EventArgs e)
+    {
+        if (Duration <= 0)
+            return;
+
+        var now = DateTime.UtcNow;
+        var elapsed = (now - _lastPlaybackTick).TotalSeconds;
+        _lastPlaybackTick = now;
+
+        var next = CurrentTime + elapsed;
+        CurrentTime = next >= Duration ? next % Duration : next;
+    }
 
     [RelayCommand]
     private void AddText()

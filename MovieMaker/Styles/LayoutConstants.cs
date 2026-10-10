@@ -37,6 +37,9 @@ public static class LayoutConstants
     public const double TimelinePixelsPerSecond = 80;
     public const double TimelineRowHeight = 24;
 
+    // 再生モードのループ更新間隔(約30fps)。
+    public const int PlaybackFrameIntervalMilliseconds = 33;
+
     // リサイズハンドルの表示サイズ(枠からのはみ出し量)。
     public const double ResizeHandleSize = 20;
     public const double ResizeHandleOverhang = 5;
