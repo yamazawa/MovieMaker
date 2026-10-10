@@ -1,7 +1,9 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -158,6 +160,31 @@ public partial class MainViewModel : ObservableObject
         if (!_clipboardImageService.TryGetImage(out var image) || image is null)
             return;
 
+        AddImageObject(image);
+    }
+
+    [RelayCommand]
+    private void AddImageFromFile(string filePath)
+    {
+        try
+        {
+            var image = new BitmapImage();
+            image.BeginInit();
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.UriSource = new Uri(filePath);
+            image.EndInit();
+            image.Freeze();
+
+            AddImageObject(image);
+        }
+        catch (Exception ex) when (ex is NotSupportedException or FileFormatException or IOException)
+        {
+            // 画像として読み込めないファイルがドロップされた場合は何もしない。
+        }
+    }
+
+    private void AddImageObject(BitmapSource image)
+    {
         var maxWidth = LayoutConstants.CanvasWidth * 0.6;
         var maxHeight = LayoutConstants.CanvasHeight * 0.6;
         var scale = Math.Min(1.0, Math.Min(maxWidth / image.PixelWidth, maxHeight / image.PixelHeight));
