@@ -8,11 +8,12 @@ using MovieMaker.ViewModels;
 namespace MovieMaker.Behaviors;
 
 /// <summary>
-/// タイムラインバー本体をドラッグして、表示時間の長さを保ったまま左右(StartTime/EndTime)を移動する添付ビヘイビア
+/// タイムラインバー本体をドラッグする添付ビヘイビア
 ///
+/// 横方向は表示時間の長さを保ったままStartTime/EndTimeを1秒単位で移動する。
+/// 縦方向はマウスの現在位置(行)に応じて、MainViewModel.Objects内での並び順を入れ替える(表示行の入れ替え)。
 /// 左右端のハンドル(TimelineEdgeDragBehavior)はe.Handled=trueで伝播を止めるため、
 /// このビヘイビアはバー中央(ハンドル以外)のドラッグのみを対象とする。
-/// 1秒単位に丸めて反映し、並び替え(TimelineSortHelper)はドラッグ完了後に行う。
 /// </summary>
 public static class TimelineBarMoveBehavior
 {
@@ -64,8 +65,8 @@ public static class TimelineBarMoveBehavior
             return;
 
         var pixelsPerSecond = TimelineScrubBehavior.GetPixelsPerSecond(canvas);
-        var current = e.GetPosition(canvas).X;
-        var deltaSeconds = Math.Round((current - origin.Mouse.X) / pixelsPerSecond / LayoutConstants.TimelineEdgeStepSeconds) * LayoutConstants.TimelineEdgeStepSeconds;
+        var current = e.GetPosition(canvas);
+        var deltaSeconds = Math.Round((current.X - origin.Mouse.X) / pixelsPerSecond / LayoutConstants.TimelineEdgeStepSeconds) * LayoutConstants.TimelineEdgeStepSeconds;
 
         var duration = origin.EndTime - origin.StartTime;
         var newStart = Math.Max(0, origin.StartTime + deltaSeconds);
@@ -82,6 +83,23 @@ public static class TimelineBarMoveBehavior
             sceneObject.StartTime = newStart;
             sceneObject.EndTime = newEnd;
         }
+
+        MoveToRowUnderMouse(canvas, sceneObject, current.Y);
+    }
+
+    // マウスのY座標が指す行へ、MainViewModel.Objects内でのオブジェクトの並び順を入れ替える。
+    private static void MoveToRowUnderMouse(Canvas canvas, SceneObjectViewModel sceneObject, double mouseY)
+    {
+        if (canvas.DataContext is not MainViewModel viewModel || viewModel.TimelineRowHeight <= 0)
+            return;
+
+        var currentIndex = viewModel.Objects.IndexOf(sceneObject);
+        if (currentIndex < 0)
+            return;
+
+        var targetIndex = Math.Clamp((int)(mouseY / viewModel.TimelineRowHeight), 0, viewModel.Objects.Count - 1);
+        if (targetIndex != currentIndex)
+            viewModel.Objects.Move(currentIndex, targetIndex);
     }
 
     private static void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -89,7 +107,6 @@ public static class TimelineBarMoveBehavior
         var element = (FrameworkElement)sender;
         element.ReleaseMouseCapture();
         DragOrigins.Remove(element);
-        TimelineSortHelper.RefreshSortOrder(element);
     }
 
     private static T? FindAncestor<T>(DependencyObject element) where T : DependencyObject
