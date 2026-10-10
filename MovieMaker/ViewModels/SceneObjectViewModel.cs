@@ -50,8 +50,17 @@ public partial class SceneObjectViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    // サイズを揃える機能で、揃えたいオブジェクトとして選ばれているか(パレットのチェックボックスで操作)。
+    [ObservableProperty]
+    private bool _isAlignTarget;
+
     // タイムライン上の表示区間バーの幅に使う(StartTime/EndTimeから算出)。
     public double DurationSeconds => EndTime - StartTime;
+
+    // パレットの一覧表示用の短い表示名。
+    public string DisplayLabel => Type == SceneObjectType.Text
+        ? (string.IsNullOrWhiteSpace(Text) ? "(文字)" : Text)
+        : "(画像)";
 
     public SceneObjectViewModel(SceneObjectType type, double x, double y, double width, double height, double startTime, double endTime, Guid? id = null)
     {
@@ -107,4 +116,6 @@ public partial class SceneObjectViewModel : ObservableObject
         if (clamped != value)
             FontSize = clamped;
     }
+
+    partial void OnTextChanged(string value) => OnPropertyChanged(nameof(DisplayLabel));
 }
