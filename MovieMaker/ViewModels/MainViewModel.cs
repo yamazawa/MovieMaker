@@ -19,11 +19,55 @@ namespace MovieMaker.ViewModels;
 public partial class MainViewModel : ObservableObject
 {
     private readonly ClipboardImageService _clipboardImageService;
+    private readonly ImageAssetService _imageAssetService;
+    private readonly MovieProjectService _movieProjectService;
 
-    public MainViewModel(ClipboardImageService clipboardImageService)
+    // 復元中はユーザー操作ではないため、MarkDirtyを抑制するためのガード。
+    private bool _isRestoring;
+    private bool _isDirty;
+
+    public MainViewModel(ClipboardImageService clipboardImageService, ImageAssetService imageAssetService, MovieProjectService movieProjectService)
     {
         _clipboardImageService = clipboardImageService;
+        _imageAssetService = imageAssetService;
+        _movieProjectService = movieProjectService;
         Objects.CollectionChanged += OnObjectsChanged;
+
+        LoadProject();
+    }
+
+    /// <summary>
+    /// 変更があれば動画プロジェクトを保存する(自動保存タイマーから呼ばれる)
+    /// </summary>
+    public void SaveIfDirty()
+    {
+        if (!_isDirty)
+            return;
+
+        _movieProjectService.Save(new MovieProject(Duration, BackgroundColorHex, Objects.Select(obj => obj.ToModel()).ToList()));
+        _isDirty = false;
+    }
+
+    private void LoadProject()
+    {
+        var project = _movieProjectService.TryLoad();
+        if (project is null)
+            return;
+
+        _isRestoring = true;
+        Duration = project.Duration;
+        BackgroundColorHex = project.BackgroundColorHex;
+        foreach (var model in project.Objects)
+            Objects.Add(SceneObjectViewModel.FromModel(model, _imageAssetService));
+        _isRestoring = false;
+
+        RefreshVisibleObjects();
+    }
+
+    private void MarkDirty()
+    {
+        if (!_isRestoring)
+            _isDirty = true;
     }
 
     [ObservableProperty]
@@ -90,6 +134,7 @@ public partial class MainViewModel : ObservableObject
             endTime: Duration)
         {
             ImageSource = image,
+            ImageFileName = _imageAssetService.SaveImage(image),
         };
 
         Objects.Add(sceneObject);
@@ -117,6 +162,8 @@ public partial class MainViewModel : ObservableObject
 
     partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
 
+    partial void OnDurationChanged(double value) => MarkDirty();
+
     private void OnObjectsChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         if (e.OldItems is not null)
@@ -132,12 +179,15 @@ public partial class MainViewModel : ObservableObject
         }
 
         RefreshVisibleObjects();
+        MarkDirty();
     }
 
     private void OnSceneObjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(SceneObjectViewModel.StartTime) or nameof(SceneObjectViewModel.EndTime))
             RefreshVisibleObjects();
+
+        MarkDirty();
     }
 
     private void RefreshVisibleObjects()
