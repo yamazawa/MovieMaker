@@ -1,4 +1,7 @@
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MovieMaker.Models;
@@ -20,6 +23,7 @@ public partial class MainViewModel : ObservableObject
     public MainViewModel(ClipboardImageService clipboardImageService)
     {
         _clipboardImageService = clipboardImageService;
+        Objects.CollectionChanged += OnObjectsChanged;
     }
 
     [ObservableProperty]
@@ -38,6 +42,9 @@ public partial class MainViewModel : ObservableObject
     private SceneObjectViewModel? _selectedObject;
 
     public ObservableCollection<SceneObjectViewModel> Objects { get; } = [];
+
+    // 現在時刻に表示範囲が重なるオブジェクトのみ。キャンバスの表示にバインドする。
+    public ObservableCollection<SceneObjectViewModel> VisibleObjects { get; } = [];
 
     [RelayCommand]
     private void ToggleMode() => Mode = Mode == AppMode.Create ? AppMode.Play : AppMode.Create;
@@ -106,5 +113,47 @@ public partial class MainViewModel : ObservableObject
 
         Objects.Remove(SelectedObject);
         SelectedObject = null;
+    }
+
+    partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
+
+    private void OnObjectsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems is not null)
+        {
+            foreach (SceneObjectViewModel item in e.OldItems)
+                item.PropertyChanged -= OnSceneObjectPropertyChanged;
+        }
+
+        if (e.NewItems is not null)
+        {
+            foreach (SceneObjectViewModel item in e.NewItems)
+                item.PropertyChanged += OnSceneObjectPropertyChanged;
+        }
+
+        RefreshVisibleObjects();
+    }
+
+    private void OnSceneObjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(SceneObjectViewModel.StartTime) or nameof(SceneObjectViewModel.EndTime))
+            RefreshVisibleObjects();
+    }
+
+    private void RefreshVisibleObjects()
+    {
+        var visible = Objects.Where(obj => obj.StartTime <= CurrentTime && CurrentTime < obj.EndTime).ToList();
+
+        for (var i = VisibleObjects.Count - 1; i >= 0; i--)
+        {
+            if (!visible.Contains(VisibleObjects[i]))
+                VisibleObjects.RemoveAt(i);
+        }
+
+        foreach (var obj in visible)
+        {
+            if (!VisibleObjects.Contains(obj))
+                VisibleObjects.Add(obj);
+        }
     }
 }
