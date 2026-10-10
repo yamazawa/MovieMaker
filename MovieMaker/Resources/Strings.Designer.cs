@@ -262,5 +262,14 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_SortObjects", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   元に戻す(Ctrl+Z) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_Undo {
+            get {
+                return ResourceManager.GetString("Button_Undo", resourceCulture);
+            }
+        }
     }
 }
