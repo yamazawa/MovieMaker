@@ -81,15 +81,21 @@
 
         <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="{x:Static styles:LayoutConstants.PaletteWidthGridLength}" />
-                <ColumnDefinition Width="*" />
+                <!-- パレットが残り幅いっぱいに広がり、キャンバスは縦サイズに応じた幅で右詰め表示する(余白を作らない)。 -->
+                <ColumnDefinition Width="*" MinWidth="{x:Static styles:LayoutConstants.PaletteWidth}" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <!-- 左 : 編集パレット。 -->
             <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
                 <StackPanel>
-                    <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
-                               FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Undo}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding UndoCommand}" />
+                        <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
+                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    </DockPanel>
                     <Button Content="{x:Static resx:Strings.Button_AddText}"
                             Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                             Command="{Binding AddTextCommand}" />
@@ -101,6 +107,7 @@
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
                         <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBox Text="{Binding Duration, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     </StackPanel>
 
@@ -114,18 +121,22 @@
                             <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                             <TextBox Text="{Binding SelectedObject.Text, UpdateSourceTrigger=PropertyChanged}"
                                      AcceptsReturn="True" TextWrapping="Wrap"
+                                     behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                      Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                             <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                             <TextBox Text="{Binding SelectedObject.FontSize}"
+                                     behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                      Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         </StackPanel>
 
                         <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
                         <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBox Text="{Binding SelectedObject.StartTime, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBox Text="{Binding SelectedObject.EndTime, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
 
                         <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
