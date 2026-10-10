@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using MovieMaker.ViewModels;
 
 namespace MovieMaker.Behaviors;
 
@@ -52,6 +53,9 @@ public static class ResizeHandleBehavior
         var handle = (FrameworkElement)sender;
         if (FindAncestor<Border>(handle) is not { } target || CanvasChildLocator.Locate(handle) is not { } located)
             return;
+
+        if (located.Canvas.DataContext is MainViewModel viewModel)
+            viewModel.BeginUndoableChange();
 
         var bounds = new Rect(Canvas.GetLeft(located.CanvasChild), Canvas.GetTop(located.CanvasChild), target.ActualWidth, target.ActualHeight);
         DragOrigins[handle] = (e.GetPosition(located.Canvas), bounds);

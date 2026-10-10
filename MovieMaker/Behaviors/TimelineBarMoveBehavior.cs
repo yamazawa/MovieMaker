@@ -52,6 +52,9 @@ public static class TimelineBarMoveBehavior
         if (element.DataContext is not SceneObjectViewModel sceneObject || FindAncestor<Canvas>(element) is not { } canvas)
             return;
 
+        if (canvas.DataContext is MainViewModel viewModel)
+            viewModel.BeginUndoableChange();
+
         DragOrigins[element] = (e.GetPosition(canvas), sceneObject.StartTime, sceneObject.EndTime);
         element.CaptureMouse();
         e.Handled = true;

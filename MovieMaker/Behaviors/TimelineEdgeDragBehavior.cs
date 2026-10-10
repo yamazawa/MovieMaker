@@ -47,6 +47,10 @@ public static class TimelineEdgeDragBehavior
     private static void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {
         var handle = (FrameworkElement)sender;
+
+        if (FindAncestor<Canvas>(handle) is { } canvas && canvas.DataContext is MainViewModel viewModel)
+            viewModel.BeginUndoableChange();
+
         handle.CaptureMouse();
 
         // バー本体(SelectOnClickBehavior)・タイムライン本体(TimelineScrubBehavior)への伝播を止め、端のドラッグのみを行わせる。

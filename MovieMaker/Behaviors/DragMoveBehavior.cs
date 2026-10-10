@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using MovieMaker.ViewModels;
 
 namespace MovieMaker.Behaviors;
 
@@ -47,6 +48,9 @@ public static class DragMoveBehavior
         var element = (FrameworkElement)sender;
         if (CanvasChildLocator.Locate(element) is not { } located)
             return;
+
+        if (located.Canvas.DataContext is MainViewModel viewModel)
+            viewModel.BeginUndoableChange();
 
         DragOrigins[element] = (e.GetPosition(located.Canvas), new Point(Canvas.GetLeft(located.CanvasChild), Canvas.GetTop(located.CanvasChild)));
         element.CaptureMouse();
