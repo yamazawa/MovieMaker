@@ -94,7 +94,8 @@
                                 Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                                 Command="{Binding UndoCommand}" />
                         <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
-                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                     </DockPanel>
                     <Button Content="{x:Static resx:Strings.Button_AddText}"
                             Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
@@ -114,7 +115,8 @@
                     <!-- 時間の挿入・削除。現在時刻を起点に、秒数分の時間を一括で挿入/削除する。 -->
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
                         <TextBlock Text="{x:Static resx:Strings.Header_TimeAdjust}"
-                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBlock Text="{x:Static resx:Strings.Label_TimeAdjustSeconds}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <TextBox Text="{Binding TimeAdjustSeconds, StringFormat=F1}"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
@@ -132,7 +134,8 @@
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
                                 Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">
                         <TextBlock Text="{x:Static resx:Strings.Header_ObjectProperties}"
-                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
 
                         <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}">
                             <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
@@ -164,7 +167,8 @@
                     <!-- サイズを揃える。①基準に設定 → ②タイムライン/キャンバス上のブロックをクリックして対象を選択 → ③確定で、対象の位置・幅・高さを基準に揃える。 -->
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
                         <TextBlock Text="{x:Static resx:Strings.Header_AlignSizes}"
-                                   FontWeight="Bold" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         <Button Content="{x:Static resx:Strings.Button_SetAlignBase}"
                                 Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                                 Command="{Binding SetAlignBaseCommand}"

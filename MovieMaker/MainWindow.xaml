@@ -13,7 +13,8 @@
         Height="{x:Static styles:LayoutConstants.WindowHeight}"
         Width="{x:Static styles:LayoutConstants.WindowWidth}"
         MinHeight="{x:Static styles:LayoutConstants.WindowMinHeight}"
-        MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}">
+        MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}"
+        FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}">
     <Window.Resources>
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
