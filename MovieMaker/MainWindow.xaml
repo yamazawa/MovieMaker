@@ -20,6 +20,8 @@
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="Z" Command="{Binding UndoCommand}" />
+        <KeyBinding Modifiers="Control" Key="C" Command="{Binding CopyCommand}" />
+        <KeyBinding Modifiers="Control" Key="V" Command="{Binding PasteCommand}" />
     </Window.InputBindings>
     <Grid Margin="{x:Static styles:LayoutConstants.RootMargin}">
         <Grid.RowDefinitions>
