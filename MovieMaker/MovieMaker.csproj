@@ -28,4 +28,8 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="Fonts\*.otf" />
+  </ItemGroup>
+
 </Project>
