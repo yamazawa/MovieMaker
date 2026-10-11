@@ -10,8 +10,8 @@
         xmlns:views="clr-namespace:MovieMaker.Views"
         mc:Ignorable="d"
         Title="{x:Static resx:Strings.WindowTitle}"
-        Height="{x:Static styles:LayoutConstants.WindowHeight}"
-        Width="{x:Static styles:LayoutConstants.WindowWidth}"
+        Height="{Binding WindowHeight, Mode=TwoWay}"
+        Width="{Binding WindowWidth, Mode=TwoWay}"
         MinHeight="{x:Static styles:LayoutConstants.WindowMinHeight}"
         MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}"
         FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}">
