@@ -25,9 +25,12 @@ public static class TimelineScrubBehavior
             new PropertyMetadata(1.0));
 
     // タイムラインの横方向の拡縮率(1秒あたりpx数)。ズーム操作で可変。
+    // ItemsControlのItemsPanel(バー・端ハンドルが属する内側のCanvas)はこの値を自分では持たないため、
+    // Inheritsで外側Canvasからの値を伝播させる(TimelineBarMoveBehavior/TimelineEdgeDragBehaviorが
+    // FindAncestor<Canvas>で取得するCanvasは内側の方になるため)。
     public static readonly DependencyProperty PixelsPerSecondProperty =
         DependencyProperty.RegisterAttached("PixelsPerSecond", typeof(double), typeof(TimelineScrubBehavior),
-            new PropertyMetadata(LayoutConstants.TimelinePixelsPerSecond));
+            new FrameworkPropertyMetadata(LayoutConstants.TimelinePixelsPerSecond, FrameworkPropertyMetadataOptions.Inherits));
 
     public static void SetIsEnabled(DependencyObject element, bool value) => element.SetValue(IsEnabledProperty, value);
 
