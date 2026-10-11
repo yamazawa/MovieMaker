@@ -68,8 +68,17 @@ public partial class MainViewModel : ObservableObject
         BackgroundColorHex = project.BackgroundColorHex;
         TimelinePixelsPerSecond = project.TimelinePixelsPerSecond > 0 ? project.TimelinePixelsPerSecond : LayoutConstants.TimelinePixelsPerSecond;
         TimelineRowHeight = project.TimelineRowHeight > 0 ? project.TimelineRowHeight : LayoutConstants.TimelineRowHeight;
+        TimelinePanelHeight = project.TimelinePanelHeight > 0 ? project.TimelinePanelHeight : LayoutConstants.TimelineHeight;
+        WindowWidth = project.WindowWidth > 0 ? project.WindowWidth : LayoutConstants.WindowWidth;
+        WindowHeight = project.WindowHeight > 0 ? project.WindowHeight : LayoutConstants.WindowHeight;
+
         foreach (var model in project.Objects)
             Objects.Add(SceneObjectViewModel.FromModel(model, _imageAssetService));
+
+        CurrentTime = Math.Clamp(project.CurrentTime, 0, Duration);
+        if (project.SelectedObjectId is { } selectedId && Objects.FirstOrDefault(obj => obj.Id == selectedId) is { } selected)
+            SetSelectedObject(selected);
+
         _isRestoring = false;
 
         RefreshVisibleObjects();
@@ -82,7 +91,9 @@ public partial class MainViewModel : ObservableObject
     }
 
     private MovieProject CaptureSnapshot() =>
-        new(Duration, BackgroundColorHex, TimelinePixelsPerSecond, TimelineRowHeight, Objects.Select(obj => obj.ToModel()).ToList());
+        new(Duration, BackgroundColorHex, TimelinePixelsPerSecond, TimelineRowHeight, TimelinePanelHeight,
+            CurrentTime, SelectedObject?.Id, WindowWidth, WindowHeight,
+            Objects.Select(obj => obj.ToModel()).ToList());
 
     /// <summary>
     /// 編集操作の直前に呼ぶ(各ドラッグ系ビヘイビアのMouseLeftButtonDown、TextBoxのGotFocus、各編集コマンドの先頭から)。
@@ -149,6 +160,17 @@ public partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     private double _timelineRowHeight = LayoutConstants.TimelineRowHeight;
+
+    // 中央(パレット+キャンバス)とタイムラインの境界(GridSplitterの位置)。次回起動時に復元する。
+    [ObservableProperty]
+    private double _timelinePanelHeight = LayoutConstants.TimelineHeight;
+
+    // ウィンドウサイズ。次回起動時に復元する。
+    [ObservableProperty]
+    private double _windowWidth = LayoutConstants.WindowWidth;
+
+    [ObservableProperty]
+    private double _windowHeight = LayoutConstants.WindowHeight;
 
     [ObservableProperty]
     private SceneObjectViewModel? _selectedObject;
@@ -447,7 +469,50 @@ public partial class MainViewModel : ObservableObject
     private static double ShiftForDelete(double time, double deleteStart, double deleteEnd) =>
         time < deleteStart ? time : (time >= deleteEnd ? time - (deleteEnd - deleteStart) : deleteStart);
 
-    partial void OnCurrentTimeChanged(double value) => RefreshVisibleObjects();
+    partial void OnCurrentTimeChanged(double value)
+    {
+        RefreshVisibleObjects();
+        MarkDirty();
+    }
+
+    partial void OnSelectedObjectChanged(SceneObjectViewModel? value) => MarkDirty();
+
+    // ウィンドウサイズ・パレット/タイムライン境界は最小値を下回らないようクランプする。
+    partial void OnWindowWidthChanged(double value)
+    {
+        var clamped = Math.Max(LayoutConstants.WindowMinWidth, value);
+        if (clamped != value)
+        {
+            WindowWidth = clamped;
+            return;
+        }
+
+        MarkDirty();
+    }
+
+    partial void OnWindowHeightChanged(double value)
+    {
+        var clamped = Math.Max(LayoutConstants.WindowMinHeight, value);
+        if (clamped != value)
+        {
+            WindowHeight = clamped;
+            return;
+        }
+
+        MarkDirty();
+    }
+
+    partial void OnTimelinePanelHeightChanged(double value)
+    {
+        var clamped = Math.Max(LayoutConstants.TimelineMinHeight, value);
+        if (clamped != value)
+        {
+            TimelinePanelHeight = clamped;
+            return;
+        }
+
+        MarkDirty();
+    }
 
     partial void OnTimeAdjustSecondsChanged(double value)
     {
