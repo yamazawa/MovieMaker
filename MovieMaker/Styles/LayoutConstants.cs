@@ -78,5 +78,8 @@ public static class LayoutConstants
     public static readonly Thickness ElementSpacing = new(0, 0, 0, 12);
     public static readonly Thickness ButtonSpacing = new(0, 4, 8, 0);
 
-    public static readonly FontFamily DefaultFontFamily = new("Meiryo");
+    // 埋め込みフォント(GenEiGothicN)。太字は専用の別ファミリーなので、合成太字ではなくこちらを使う。
+    private static readonly Uri FontBaseUri = new("pack://application:,,,/");
+    public static readonly FontFamily DefaultFontFamily = new(FontBaseUri, "./Fonts/#GenEi Gothic N Regular");
+    public static readonly FontFamily DefaultBoldFontFamily = new(FontBaseUri, "./Fonts/#GenEi Gothic N Bold");
 }
