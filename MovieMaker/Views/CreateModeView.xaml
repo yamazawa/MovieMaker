@@ -1,0 +1,235 @@
+<UserControl x:Class="MovieMaker.Views.CreateModeView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:styles="clr-namespace:MovieMaker.Styles"
+             xmlns:resx="clr-namespace:MovieMaker.Resources"
+             xmlns:conv="clr-namespace:MovieMaker.Converters"
+             xmlns:behaviors="clr-namespace:MovieMaker.Behaviors"
+             xmlns:views="clr-namespace:MovieMaker.Views"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <conv:HexColorToBrushConverter x:Key="HexColorToBrushConverter" />
+        <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
+        <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:DoubleToGridLengthConverter x:Key="DoubleToGridLengthConverter" />
+
+        <!-- オブジェクト一覧はCanvas上に配置するため、ItemsPanelをCanvasにし、Canvas.Left/TopをX/Yへ双方向バインドする。 -->
+        <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}" />
+            <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}" />
+        </Style>
+
+        <DataTemplate x:Key="ObjectTemplate">
+            <Border Width="{Binding Width, Mode=TwoWay}" Height="{Binding Height, Mode=TwoWay}"
+                    BorderThickness="2" Background="Transparent" Cursor="SizeAll"
+                    behaviors:DragMoveBehavior.IsEnabled="True"
+                    behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}">
+                <Border.BorderBrush>
+                    <MultiBinding Converter="{StaticResource AlignStateBrushConverter}">
+                        <Binding Path="IsSelected" />
+                        <Binding Path="IsAlignTarget" />
+                    </MultiBinding>
+                </Border.BorderBrush>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="{x:Static styles:LayoutConstants.ResizeHandleGridLength}" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.RowSpan="3" Grid.ColumnSpan="3" Text="{Binding Text}" FontSize="{Binding FontSize}"
+                               Foreground="White" TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" IsHitTestVisible="False"
+                               Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}" />
+                    <Image Grid.RowSpan="3" Grid.ColumnSpan="3" Source="{Binding ImageSource}" Stretch="Fill" IsHitTestVisible="False"
+                           Visibility="{Binding Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Image}" />
+
+                    <!-- 4隅・4辺のドラッグ可能なリサイズ領域。表示なし(Transparent)、元矩形より少し外側にはみ出す。 -->
+                    <Rectangle Grid.Row="0" Grid.Column="0" Margin="-5,-5,0,0" Fill="Transparent" Cursor="SizeNWSE"
+                               behaviors:ResizeHandleBehavior.Direction="TopLeft" />
+                    <Rectangle Grid.Row="0" Grid.Column="1" Margin="0,-5,0,0" Fill="Transparent" Cursor="SizeNS"
+                               behaviors:ResizeHandleBehavior.Direction="Top" />
+                    <Rectangle Grid.Row="0" Grid.Column="2" Margin="0,-5,-5,0" Fill="Transparent" Cursor="SizeNESW"
+                               behaviors:ResizeHandleBehavior.Direction="TopRight" />
+                    <Rectangle Grid.Row="1" Grid.Column="0" Margin="-5,0,0,0" Fill="Transparent" Cursor="SizeWE"
+                               behaviors:ResizeHandleBehavior.Direction="Left" />
+                    <Rectangle Grid.Row="1" Grid.Column="2" Margin="0,0,-5,0" Fill="Transparent" Cursor="SizeWE"
+                               behaviors:ResizeHandleBehavior.Direction="Right" />
+                    <Rectangle Grid.Row="2" Grid.Column="0" Margin="-5,0,0,-5" Fill="Transparent" Cursor="SizeNESW"
+                               behaviors:ResizeHandleBehavior.Direction="BottomLeft" />
+                    <Rectangle Grid.Row="2" Grid.Column="1" Margin="0,0,0,-5" Fill="Transparent" Cursor="SizeNS"
+                               behaviors:ResizeHandleBehavior.Direction="Bottom" />
+                    <Rectangle Grid.Row="2" Grid.Column="2" Margin="0,0,-5,-5" Fill="Transparent" Cursor="SizeNWSE"
+                               behaviors:ResizeHandleBehavior.Direction="BottomRight" />
+                </Grid>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" MinHeight="{x:Static styles:LayoutConstants.ContentMinHeight}" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="{Binding TimelinePanelHeight, Converter={StaticResource DoubleToGridLengthConverter}, Mode=TwoWay}"
+                           MinHeight="{x:Static styles:LayoutConstants.TimelineMinHeight}" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <!-- パレットが残り幅いっぱいに広がり、キャンバスは縦サイズに応じた幅で右詰め表示する(余白を作らない)。 -->
+                <ColumnDefinition Width="*" MinWidth="{x:Static styles:LayoutConstants.PaletteWidth}" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- 左 : 編集パレット。 -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Undo}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding UndoCommand}" />
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Paste}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding PasteCommand}" />
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Copy}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding CopyCommand}" />
+                        <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    </DockPanel>
+                    <Button Content="{x:Static resx:Strings.Button_AddText}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddTextCommand}" />
+                    <Button Content="{x:Static resx:Strings.Button_AddImage}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddImageFromClipboardCommand}" />
+
+                    <!-- 動画全体の長さ(1秒～10分)。入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Label_Duration}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding Duration, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                    </StackPanel>
+
+                    <!-- 時間の挿入・削除。現在時刻を起点に、秒数分の時間を一括で挿入/削除する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_TimeAdjust}"
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBlock Text="{x:Static resx:Strings.Label_TimeAdjustSeconds}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding TimeAdjustSeconds, StringFormat=F1}"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{x:Static resx:Strings.Button_InsertTime}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding InsertTimeCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_DeleteTimeRange}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding DeleteTimeRangeCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- 選択中オブジェクトの編集項目。SelectedObjectがある場合のみ表示する。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}"
+                                Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_ObjectProperties}"
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+
+                        <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Text}">
+                            <TextBlock Text="{x:Static resx:Strings.Label_Text}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBox Text="{Binding SelectedObject.Text, UpdateSourceTrigger=PropertyChanged}"
+                                     AcceptsReturn="True" TextWrapping="Wrap"
+                                     behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
+                                     Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBlock Text="{x:Static resx:Strings.Label_FontSize}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBox Text="{Binding SelectedObject.FontSize}"
+                                     behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
+                                     Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        </StackPanel>
+
+                        <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
+                        <TextBlock Text="{x:Static resx:Strings.Label_StartTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.StartTime, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBlock Text="{x:Static resx:Strings.Label_EndTime}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <TextBox Text="{Binding SelectedObject.EndTime, StringFormat=F1}"
+                                 behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
+                                 Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+
+                        <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
+                                HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding DeleteSelectedCommand}" />
+                    </StackPanel>
+
+                    <!-- サイズを揃える。①基準に設定 → ②タイムライン/キャンバス上のブロックをクリックして対象を選択 → ③確定で、対象の位置・幅・高さを基準に揃える。 -->
+                    <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
+                        <TextBlock Text="{x:Static resx:Strings.Header_AlignSizes}"
+                                   FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
+                                   Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <Button Content="{x:Static resx:Strings.Button_SetAlignBase}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding SetAlignBaseCommand}"
+                                Visibility="{Binding SelectedObject, Converter={StaticResource NullToVisibilityConverter}}" />
+
+                        <StackPanel Visibility="{Binding AlignBaseObject, Converter={StaticResource NullToVisibilityConverter}}">
+                            <TextBlock Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
+                                <Run Text="{x:Static resx:Strings.Label_AlignBase}" />
+                                <Run Text=": " />
+                                <Run Text="{Binding AlignBaseObject.DisplayLabel, Mode=OneWay}" />
+                            </TextBlock>
+                            <TextBlock TextWrapping="Wrap" Opacity="0.7" Margin="{x:Static styles:LayoutConstants.FieldSpacing}"
+                                       Text="{x:Static resx:Strings.Hint_AlignSelectTargets}" />
+                            <TextBlock Margin="{x:Static styles:LayoutConstants.FieldSpacing}">
+                                <Run Text="{x:Static resx:Strings.Label_AlignTargetCount}" />
+                                <Run Text="{Binding AlignTargetCount, Mode=OneWay}" />
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="{x:Static resx:Strings.Button_ConfirmAlignSizes}"
+                                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                        Command="{Binding ConfirmAlignSizesCommand}" />
+                                <Button Content="{x:Static resx:Strings.Button_CancelAlign}"
+                                        Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                        Command="{Binding CancelAlignCommand}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- 中央 : キャンバス(動画本体)。画像ファイルのドラッグ&ドロップでも画像オブジェクトを追加できる。 -->
+            <Viewbox Grid.Column="1" Stretch="Uniform" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
+                <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}"
+                      behaviors:ImageDropBehavior.Command="{Binding AddImageFromFileCommand}">
+                    <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+                    <ItemsControl Background="Transparent" ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
+                                  ItemContainerStyle="{StaticResource ObjectContainerStyle}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas IsItemsHost="True" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Grid>
+            </Viewbox>
+        </Grid>
+
+        <!-- 中央とタイムラインの境界。ドラッグで表示割合を調整できる。 -->
+        <GridSplitter Grid.Row="1" Height="{x:Static styles:LayoutConstants.SplitterThickness}"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                      ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Cursor="SizeNS" />
+
+        <!-- 下部 : タイムライン(スライドバー兼タイミングチャート)。 -->
+        <views:TimelineControl Grid.Row="2" Margin="{x:Static styles:LayoutConstants.SectionSpacing}" />
+    </Grid>
+</UserControl>
