@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -26,6 +27,7 @@ public partial class MainViewModel : ObservableObject
     private readonly MovieProjectService _movieProjectService;
     private readonly DispatcherTimer _playbackTimer;
     private readonly Stack<MovieProject> _undoStack = new();
+    private List<SceneObject>? _clipboard;
 
     // 復元中はユーザー操作ではないため、MarkDirty/Undoスナップショット記録を抑制するためのガード。
     private bool _isRestoring;
@@ -332,7 +334,10 @@ public partial class MainViewModel : ObservableObject
             return;
         }
 
-        SetSelectedObject(sceneObject);
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+            ToggleSelection(sceneObject);
+        else
+            SetSelectedObject(sceneObject);
 
         if (!isTimelineClick)
             return;
@@ -342,11 +347,58 @@ public partial class MainViewModel : ObservableObject
             CurrentTime = Math.Clamp(sceneObject.StartTime, 0, Duration);
     }
 
+    // Ctrl+クリックでの複数選択。選択中(IsSelected)を解除せず対象のみ反転する。
+    // パレットの編集項目は単一オブジェクト向けのため、SelectedObjectは直近で選択状態になったものを指す。
+    private void ToggleSelection(SceneObjectViewModel sceneObject)
+    {
+        sceneObject.IsSelected = !sceneObject.IsSelected;
+        SelectedObject = sceneObject.IsSelected ? sceneObject : Objects.FirstOrDefault(obj => obj.IsSelected);
+    }
+
     [RelayCommand]
     private void SelectObject(SceneObjectViewModel sceneObject) => HandleObjectClick(sceneObject, isTimelineClick: false);
 
     [RelayCommand]
     private void SelectTimelineObject(SceneObjectViewModel sceneObject) => HandleObjectClick(sceneObject, isTimelineClick: true);
+
+    // 選択中(IsSelected)の全オブジェクトをコピーする。複数選択中でも対応するため、単一選択のSelectedObjectではなくIsSelectedで集める。
+    [RelayCommand]
+    private void Copy()
+    {
+        var selected = Objects.Where(obj => obj.IsSelected).ToList();
+        if (selected.Count == 0)
+            return;
+
+        _clipboard = selected.Select(obj => obj.ToModel()).ToList();
+    }
+
+    // 現在時刻を基準に、コピー時の相対的な時刻関係(開始時刻の差・表示時間)を保ったまま貼り付ける。
+    [RelayCommand]
+    private void Paste()
+    {
+        if (_clipboard is null || _clipboard.Count == 0)
+            return;
+
+        BeginUndoableChange();
+
+        var anchorTime = _clipboard.Min(model => model.StartTime);
+        var pasted = _clipboard
+            .Select(model =>
+            {
+                var newStart = CurrentTime + (model.StartTime - anchorTime);
+                return model with { Id = Guid.NewGuid(), StartTime = newStart, EndTime = newStart + (model.EndTime - model.StartTime) };
+            })
+            .Select(model => SceneObjectViewModel.FromModel(model, _imageAssetService))
+            .ToList();
+
+        foreach (var obj in pasted)
+            Objects.Add(obj);
+
+        foreach (var obj in Objects)
+            obj.IsSelected = pasted.Contains(obj);
+
+        SelectedObject = pasted.FirstOrDefault();
+    }
 
     // タイムチャートを①開始時刻の昇順、②開始時刻が同じ場合は終了時刻の降順、で並べ替える。
     [RelayCommand]

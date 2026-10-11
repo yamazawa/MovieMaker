@@ -95,6 +95,12 @@
                         <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Undo}"
                                 Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                                 Command="{Binding UndoCommand}" />
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Paste}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding PasteCommand}" />
+                        <Button DockPanel.Dock="Right" Content="{x:Static resx:Strings.Button_Copy}"
+                                Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                Command="{Binding CopyCommand}" />
                         <TextBlock Text="{x:Static resx:Strings.Header_Palette}"
                                    FontFamily="{x:Static styles:LayoutConstants.DefaultBoldFontFamily}"
                                    Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
