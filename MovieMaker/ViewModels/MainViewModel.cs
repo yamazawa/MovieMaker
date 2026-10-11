@@ -204,12 +204,14 @@ public partial class MainViewModel : ObservableObject
     {
         BeginUndoableChange();
 
+        var (x, y, width, height) = ResolveNewObjectBounds(LayoutConstants.DefaultObjectWidth, LayoutConstants.DefaultObjectHeight);
+
         var sceneObject = new SceneObjectViewModel(
             SceneObjectType.Text,
-            x: (LayoutConstants.CanvasWidth - LayoutConstants.DefaultObjectWidth) / 2,
-            y: (LayoutConstants.CanvasHeight - LayoutConstants.DefaultObjectHeight) / 2,
-            width: LayoutConstants.DefaultObjectWidth,
-            height: LayoutConstants.DefaultObjectHeight,
+            x: x,
+            y: y,
+            width: width,
+            height: height,
             startTime: CurrentTime,
             endTime: CurrentTime + LayoutConstants.DefaultObjectDurationSeconds)
         {
@@ -256,13 +258,12 @@ public partial class MainViewModel : ObservableObject
         var maxWidth = LayoutConstants.CanvasWidth * 0.6;
         var maxHeight = LayoutConstants.CanvasHeight * 0.6;
         var scale = Math.Min(1.0, Math.Min(maxWidth / image.PixelWidth, maxHeight / image.PixelHeight));
-        var width = image.PixelWidth * scale;
-        var height = image.PixelHeight * scale;
+        var (x, y, width, height) = ResolveNewObjectBounds(image.PixelWidth * scale, image.PixelHeight * scale);
 
         var sceneObject = new SceneObjectViewModel(
             SceneObjectType.Image,
-            x: (LayoutConstants.CanvasWidth - width) / 2,
-            y: (LayoutConstants.CanvasHeight - height) / 2,
+            x: x,
+            y: y,
             width: width,
             height: height,
             startTime: CurrentTime,
@@ -274,6 +275,16 @@ public partial class MainViewModel : ObservableObject
 
         Objects.Add(sceneObject);
         SetSelectedObject(sceneObject);
+    }
+
+    // 新規オブジェクトの配置位置・サイズ。選択中オブジェクトがあればそれと同じ位置・サイズに合わせ、
+    // なければキャンバス中央に既定サイズ(引数)で配置する。
+    private (double X, double Y, double Width, double Height) ResolveNewObjectBounds(double defaultWidth, double defaultHeight)
+    {
+        if (SelectedObject is not null)
+            return (SelectedObject.X, SelectedObject.Y, SelectedObject.Width, SelectedObject.Height);
+
+        return ((LayoutConstants.CanvasWidth - defaultWidth) / 2, (LayoutConstants.CanvasHeight - defaultHeight) / 2, defaultWidth, defaultHeight);
     }
 
     // クリック選択の共通処理。サイズ揃えの基準選択中(AlignBaseObjectがある間)はSelectObjectCommand側で分岐するため、
