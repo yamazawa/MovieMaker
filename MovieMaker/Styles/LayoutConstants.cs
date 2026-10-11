@@ -33,9 +33,6 @@ public static class LayoutConstants
     public const double MinDurationSeconds = 1.0;
     public const double MaxDurationSeconds = 600.0;
 
-    // Grid.RowDefinition.HeightはGridLength型のため、double定数(TimelineHeight)とは別にGridLength版を用意する。
-    public static readonly GridLength TimelineHeightGridLength = new(TimelineHeight);
-
     // 新規オブジェクトの既定サイズ・配置・表示時間(現在時刻から何秒間表示するか)。
     public const double DefaultObjectWidth = 300;
     public const double DefaultObjectHeight = 100;

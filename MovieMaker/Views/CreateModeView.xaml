@@ -14,6 +14,7 @@
         <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
         <conv:SceneObjectTypeVisibilityConverter x:Key="SceneObjectTypeVisibilityConverter" />
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:DoubleToGridLengthConverter x:Key="DoubleToGridLengthConverter" />
 
         <!-- オブジェクト一覧はCanvas上に配置するため、ItemsPanelをCanvasにし、Canvas.Left/TopをX/Yへ双方向バインドする。 -->
         <Style x:Key="ObjectContainerStyle" TargetType="ContentPresenter">
@@ -76,7 +77,8 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="*" MinHeight="{x:Static styles:LayoutConstants.ContentMinHeight}" />
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="{x:Static styles:LayoutConstants.TimelineHeightGridLength}" MinHeight="{x:Static styles:LayoutConstants.TimelineMinHeight}" />
+            <RowDefinition Height="{Binding TimelinePanelHeight, Converter={StaticResource DoubleToGridLengthConverter}, Mode=TwoWay}"
+                           MinHeight="{x:Static styles:LayoutConstants.TimelineMinHeight}" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
