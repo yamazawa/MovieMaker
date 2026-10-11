@@ -273,6 +273,24 @@ namespace MovieMaker.Resources {
         }
 
         /// <summary>
+        ///   コピー(Ctrl+C) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_Copy {
+            get {
+                return ResourceManager.GetString("Button_Copy", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   ペースト(Ctrl+V) に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_Paste {
+            get {
+                return ResourceManager.GetString("Button_Paste", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   時間の挿入・削除 に類似しているローカライズされた文字列を検索します。
         /// </summary>
         public static string Header_TimeAdjust {
