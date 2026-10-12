@@ -148,4 +148,10 @@
   <data name="Button_DeleteTimeRange" xml:space="preserve">
     <value>現在時刻から削除</value>
   </data>
+  <data name="Button_PausePlayback" xml:space="preserve">
+    <value>停止</value>
+  </data>
+  <data name="Button_ResumePlayback" xml:space="preserve">
+    <value>再開</value>
+  </data>
 </root>
