@@ -148,4 +148,25 @@
   <data name="Button_DeleteTimeRange" xml:space="preserve">
     <value>現在時刻から削除</value>
   </data>
+  <data name="Header_AlignPosition" xml:space="preserve">
+    <value>位置を揃える</value>
+  </data>
+  <data name="Button_AlignLeft" xml:space="preserve">
+    <value>左寄せ</value>
+  </data>
+  <data name="Button_AlignCenterX" xml:space="preserve">
+    <value>中央(横)</value>
+  </data>
+  <data name="Button_AlignRight" xml:space="preserve">
+    <value>右寄せ</value>
+  </data>
+  <data name="Button_AlignTop" xml:space="preserve">
+    <value>上寄せ</value>
+  </data>
+  <data name="Button_AlignCenterY" xml:space="preserve">
+    <value>中央(縦)</value>
+  </data>
+  <data name="Button_AlignBottom" xml:space="preserve">
+    <value>下寄せ</value>
+  </data>
 </root>
