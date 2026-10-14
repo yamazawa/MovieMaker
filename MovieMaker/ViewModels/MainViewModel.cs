@@ -197,6 +197,10 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isPlaying = true;
 
+    // 再生モードの全画面表示状態。作成モードへ戻ると解除する。
+    [ObservableProperty]
+    private bool _isFullScreen;
+
     [RelayCommand]
     private void ToggleMode() => Mode = Mode == AppMode.Create ? AppMode.Play : AppMode.Create;
 
@@ -212,8 +216,15 @@ public partial class MainViewModel : ObservableObject
         else
         {
             _playbackTimer.Stop();
+            IsFullScreen = false;
         }
     }
+
+    [RelayCommand]
+    private void ToggleFullScreen() => IsFullScreen = !IsFullScreen;
+
+    [RelayCommand]
+    private void ExitFullScreen() => IsFullScreen = false;
 
     [RelayCommand]
     private void TogglePlayback()
