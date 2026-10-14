@@ -449,6 +449,38 @@ public partial class MainViewModel : ObservableObject
         SelectedObject = null;
     }
 
+    // キャンバス基準の位置揃え。選択中(IsSelected)の全オブジェクトに適用する(複数選択時は各オブジェクトが個別にキャンバス端・中央へ揃う)。
+    // 「サイズを揃える」(基準オブジェクトに合わせる機能)とは別の機能。
+    [RelayCommand]
+    private void AlignLeft() => AlignSelectedPosition(obj => obj.X = 0);
+
+    [RelayCommand]
+    private void AlignCenterX() => AlignSelectedPosition(obj => obj.X = (LayoutConstants.CanvasWidth - obj.Width) / 2);
+
+    [RelayCommand]
+    private void AlignRight() => AlignSelectedPosition(obj => obj.X = LayoutConstants.CanvasWidth - obj.Width);
+
+    [RelayCommand]
+    private void AlignTop() => AlignSelectedPosition(obj => obj.Y = 0);
+
+    [RelayCommand]
+    private void AlignCenterY() => AlignSelectedPosition(obj => obj.Y = (LayoutConstants.CanvasHeight - obj.Height) / 2);
+
+    [RelayCommand]
+    private void AlignBottom() => AlignSelectedPosition(obj => obj.Y = LayoutConstants.CanvasHeight - obj.Height);
+
+    private void AlignSelectedPosition(Action<SceneObjectViewModel> align)
+    {
+        var selected = Objects.Where(obj => obj.IsSelected).ToList();
+        if (selected.Count == 0)
+            return;
+
+        BeginUndoableChange();
+
+        foreach (var obj in selected)
+            align(obj);
+    }
+
     [RelayCommand]
     private void SetAlignBase()
     {

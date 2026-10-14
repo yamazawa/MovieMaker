@@ -167,6 +167,31 @@
                                  behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                  Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
 
+                        <!-- キャンバス上の位置揃え。複数選択中は選択中の全オブジェクトに適用する。水平・垂直は別行。 -->
+                        <TextBlock Text="{x:Static resx:Strings.Header_AlignPosition}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{x:Static resx:Strings.Button_AlignLeft}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignLeftCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_AlignCenterX}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignCenterXCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_AlignRight}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignRightCommand}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="{x:Static resx:Strings.Button_AlignTop}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignTopCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_AlignCenterY}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignCenterYCommand}" />
+                            <Button Content="{x:Static resx:Strings.Button_AlignBottom}"
+                                    Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                                    Command="{Binding AlignBottomCommand}" />
+                        </StackPanel>
+
                         <Button Content="{x:Static resx:Strings.Button_DeleteSelected}"
                                 HorizontalAlignment="Right" Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                                 Command="{Binding DeleteSelectedCommand}" />
