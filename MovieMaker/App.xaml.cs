@@ -21,8 +21,10 @@ public partial class App : Application
 
         var clipboardImageService = new ClipboardImageService();
         var imageAssetService = new ImageAssetService();
+        var audioAssetService = new AudioAssetService();
+        var audioFilePickerService = new AudioFilePickerService();
         var movieProjectService = new MovieProjectService();
-        _viewModel = new MainViewModel(clipboardImageService, imageAssetService, movieProjectService);
+        _viewModel = new MainViewModel(clipboardImageService, imageAssetService, audioAssetService, audioFilePickerService, movieProjectService);
 
         _autoSaveTimer = new DispatcherTimer { Interval = AutoSaveInterval };
         _autoSaveTimer.Tick += (_, _) => _viewModel.SaveIfDirty();
