@@ -18,6 +18,7 @@
     <Window.Resources>
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
+        <conv:PlaybackToggleLabelConverter x:Key="PlaybackToggleLabelConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="Z" Command="{Binding UndoCommand}" />
@@ -34,6 +35,9 @@
         <DockPanel Grid.Row="0" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
             <Button DockPanel.Dock="Right" Content="{Binding Mode, Converter={StaticResource ModeToggleLabelConverter}}"
                     Command="{Binding ToggleModeCommand}" />
+            <Button DockPanel.Dock="Right" Content="{Binding IsPlaying, Converter={StaticResource PlaybackToggleLabelConverter}}"
+                    Command="{Binding TogglePlaybackCommand}"
+                    Visibility="{Binding Mode, Converter={StaticResource AppModeVisibilityConverter}, ConverterParameter=Play}" />
         </DockPanel>
 
         <!-- 下部 : 作成モード/再生モードの画面を、モードに応じて切り替える。 -->

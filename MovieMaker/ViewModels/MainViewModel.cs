@@ -193,6 +193,10 @@ public partial class MainViewModel : ObservableObject
     // 現在時刻に表示範囲が重なるオブジェクトのみ。キャンバスの表示にバインドする。
     public ObservableCollection<SceneObjectViewModel> VisibleObjects { get; } = [];
 
+    // 再生モード中の再生/一時停止状態。モード切替で再生モードに入るたびに再生中へ戻す。
+    [ObservableProperty]
+    private bool _isPlaying = true;
+
     [RelayCommand]
     private void ToggleMode() => Mode = Mode == AppMode.Create ? AppMode.Play : AppMode.Create;
 
@@ -200,6 +204,23 @@ public partial class MainViewModel : ObservableObject
     partial void OnModeChanged(AppMode value)
     {
         if (value == AppMode.Play)
+        {
+            IsPlaying = true;
+            _lastPlaybackTick = DateTime.UtcNow;
+            _playbackTimer.Start();
+        }
+        else
+        {
+            _playbackTimer.Stop();
+        }
+    }
+
+    [RelayCommand]
+    private void TogglePlayback()
+    {
+        IsPlaying = !IsPlaying;
+
+        if (IsPlaying)
         {
             _lastPlaybackTick = DateTime.UtcNow;
             _playbackTimer.Start();
