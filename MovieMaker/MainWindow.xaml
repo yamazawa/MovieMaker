@@ -15,8 +15,8 @@
         MinHeight="{x:Static styles:LayoutConstants.WindowMinHeight}"
         MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}"
         FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}"
-        WindowStyle="{Binding IsFullScreen, Converter={StaticResource FullScreenWindowStyleConverter}}"
-        WindowState="{Binding IsFullScreen, Converter={StaticResource FullScreenWindowStateConverter}}">
+        WindowStyle="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenWindowStyleConverter}}"
+        WindowState="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenWindowStateConverter}}">
     <Window.Resources>
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
