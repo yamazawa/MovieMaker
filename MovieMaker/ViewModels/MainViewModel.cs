@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -24,9 +25,12 @@ public partial class MainViewModel : ObservableObject
 {
     private readonly ClipboardImageService _clipboardImageService;
     private readonly ImageAssetService _imageAssetService;
+    private readonly AudioAssetService _audioAssetService;
+    private readonly AudioFilePickerService _audioFilePickerService;
     private readonly MovieProjectService _movieProjectService;
     private readonly DispatcherTimer _playbackTimer;
     private readonly Stack<MovieProject> _undoStack = new();
+    private readonly Dictionary<Guid, MediaPlayer> _activeAudioPlayers = new();
     private List<SceneObject>? _clipboard;
 
     // 復元中はユーザー操作ではないため、MarkDirty/Undoスナップショット記録を抑制するためのガード。
@@ -34,10 +38,13 @@ public partial class MainViewModel : ObservableObject
     private bool _isDirty;
     private DateTime _lastPlaybackTick;
 
-    public MainViewModel(ClipboardImageService clipboardImageService, ImageAssetService imageAssetService, MovieProjectService movieProjectService)
+    public MainViewModel(ClipboardImageService clipboardImageService, ImageAssetService imageAssetService,
+        AudioAssetService audioAssetService, AudioFilePickerService audioFilePickerService, MovieProjectService movieProjectService)
     {
         _clipboardImageService = clipboardImageService;
         _imageAssetService = imageAssetService;
+        _audioAssetService = audioAssetService;
+        _audioFilePickerService = audioFilePickerService;
         _movieProjectService = movieProjectService;
         Objects.CollectionChanged += OnObjectsChanged;
 
@@ -212,11 +219,13 @@ public partial class MainViewModel : ObservableObject
             IsPlaying = true;
             _lastPlaybackTick = DateTime.UtcNow;
             _playbackTimer.Start();
+            UpdateAudioPlayback();
         }
         else
         {
             _playbackTimer.Stop();
             IsFullScreen = false;
+            StopAllAudio();
         }
     }
 
@@ -235,10 +244,14 @@ public partial class MainViewModel : ObservableObject
         {
             _lastPlaybackTick = DateTime.UtcNow;
             _playbackTimer.Start();
+            foreach (var player in _activeAudioPlayers.Values)
+                player.Play();
         }
         else
         {
             _playbackTimer.Stop();
+            foreach (var player in _activeAudioPlayers.Values)
+                player.Pause();
         }
     }
 
@@ -253,6 +266,51 @@ public partial class MainViewModel : ObservableObject
 
         var next = CurrentTime + elapsed;
         CurrentTime = next >= Duration ? next % Duration : next;
+
+        UpdateAudioPlayback();
+    }
+
+    // 現在時刻がBGM/SEの表示区間に入ったら再生開始、区間を外れたら停止する。
+    // 配置した表示時間が音声ファイルの長さより長い場合は、MediaEndedで先頭に戻しループ再生する。
+    private void UpdateAudioPlayback()
+    {
+        var active = Objects.Where(obj => obj.Type == SceneObjectType.Audio && obj.AudioFileName is not null &&
+            obj.StartTime <= CurrentTime && CurrentTime < obj.EndTime).ToList();
+
+        foreach (var id in _activeAudioPlayers.Keys.Where(id => active.All(obj => obj.Id != id)).ToList())
+            StopAudio(id);
+
+        foreach (var obj in active.Where(obj => !_activeAudioPlayers.ContainsKey(obj.Id)))
+            StartAudio(obj);
+    }
+
+    private void StartAudio(SceneObjectViewModel obj)
+    {
+        var player = new MediaPlayer();
+        player.MediaEnded += (_, _) =>
+        {
+            player.Position = TimeSpan.Zero;
+            player.Play();
+        };
+        player.Open(_audioAssetService.GetUri(obj.AudioFileName!));
+        player.Play();
+
+        _activeAudioPlayers[obj.Id] = player;
+    }
+
+    private void StopAudio(Guid id)
+    {
+        if (!_activeAudioPlayers.Remove(id, out var player))
+            return;
+
+        player.Stop();
+        player.Close();
+    }
+
+    private void StopAllAudio()
+    {
+        foreach (var id in _activeAudioPlayers.Keys.ToList())
+            StopAudio(id);
     }
 
     [RelayCommand]
@@ -272,6 +330,37 @@ public partial class MainViewModel : ObservableObject
             endTime: CurrentTime + LayoutConstants.DefaultObjectDurationSeconds)
         {
             FontSize = LayoutConstants.DefaultFontSize,
+        };
+
+        Objects.Add(sceneObject);
+        SetSelectedObject(sceneObject);
+    }
+
+    // BGMは動画の残り時間いっぱい、SEは既定の短い表示時間で配置する(どちらも後からタイムラインで調整できる)。
+    [RelayCommand]
+    private void AddBgm() => AddAudioObject(Math.Max(LayoutConstants.DefaultObjectDurationSeconds, Duration - CurrentTime));
+
+    [RelayCommand]
+    private void AddSe() => AddAudioObject(LayoutConstants.DefaultObjectDurationSeconds);
+
+    private void AddAudioObject(double durationSeconds)
+    {
+        var filePath = _audioFilePickerService.PickFile();
+        if (filePath is null)
+            return;
+
+        BeginUndoableChange();
+
+        var sceneObject = new SceneObjectViewModel(
+            SceneObjectType.Audio,
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            startTime: CurrentTime,
+            endTime: CurrentTime + durationSeconds)
+        {
+            AudioFileName = _audioAssetService.SaveAudio(filePath),
         };
 
         Objects.Add(sceneObject);
@@ -704,9 +793,10 @@ public partial class MainViewModel : ObservableObject
         MarkDirty();
     }
 
+    // 音声(BGM/SE)はキャンバス上の見た目を持たないため、VisibleObjects(キャンバス表示用)には含めない。
     private void RefreshVisibleObjects()
     {
-        var visible = Objects.Where(obj => obj.StartTime <= CurrentTime && CurrentTime < obj.EndTime).ToList();
+        var visible = Objects.Where(obj => obj.Type != SceneObjectType.Audio && obj.StartTime <= CurrentTime && CurrentTime < obj.EndTime).ToList();
 
         for (var i = VisibleObjects.Count - 1; i >= 0; i--)
         {
