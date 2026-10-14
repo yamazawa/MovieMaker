@@ -21,8 +21,6 @@
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
         <conv:PlaybackToggleLabelConverter x:Key="PlaybackToggleLabelConverter" />
-        <conv:FullScreenWindowStyleConverter x:Key="FullScreenWindowStyleConverter" />
-        <conv:FullScreenWindowStateConverter x:Key="FullScreenWindowStateConverter" />
         <conv:FullScreenToggleLabelConverter x:Key="FullScreenToggleLabelConverter" />
     </Window.Resources>
     <Window.InputBindings>
