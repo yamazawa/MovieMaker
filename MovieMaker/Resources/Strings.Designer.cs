@@ -410,5 +410,23 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_ResumePlayback", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   全画面 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_EnterFullScreen {
+            get {
+                return ResourceManager.GetString("Button_EnterFullScreen", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   全画面を終了 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_ExitFullScreen {
+            get {
+                return ResourceManager.GetString("Button_ExitFullScreen", resourceCulture);
+            }
+        }
     }
 }

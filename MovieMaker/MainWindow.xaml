@@ -14,29 +14,42 @@
         Width="{Binding WindowWidth, Mode=TwoWay}"
         MinHeight="{x:Static styles:LayoutConstants.WindowMinHeight}"
         MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}"
-        FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}">
+        FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}"
+        WindowStyle="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenWindowStyleConverter}}"
+        WindowState="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenWindowStateConverter}}"
+        MaxWidth="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenMaxSizeConverter}}"
+        MaxHeight="{Binding IsFullScreen, Mode=OneWay, Converter={StaticResource FullScreenMaxSizeConverter}, ConverterParameter=Height}"
+        Topmost="{Binding IsFullScreen, Mode=OneWay}">
     <Window.Resources>
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
         <conv:PlaybackToggleLabelConverter x:Key="PlaybackToggleLabelConverter" />
+        <conv:FullScreenToggleLabelConverter x:Key="FullScreenToggleLabelConverter" />
+        <conv:FullScreenBarVisibilityConverter x:Key="FullScreenBarVisibilityConverter" />
+        <conv:FullScreenMarginConverter x:Key="FullScreenMarginConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="Z" Command="{Binding UndoCommand}" />
         <KeyBinding Modifiers="Control" Key="C" Command="{Binding CopyCommand}" />
         <KeyBinding Modifiers="Control" Key="V" Command="{Binding PasteCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding ExitFullScreenCommand}" />
     </Window.InputBindings>
-    <Grid Margin="{x:Static styles:LayoutConstants.RootMargin}">
+    <Grid Margin="{Binding IsFullScreen, Converter={StaticResource FullScreenMarginConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <!-- 上部 : モード切替。 -->
-        <DockPanel Grid.Row="0" Margin="{x:Static styles:LayoutConstants.SectionSpacing}">
+        <!-- 上部 : モード切替。全画面中はアプリであることを感じさせないよう非表示にする。 -->
+        <DockPanel Grid.Row="0" Margin="{x:Static styles:LayoutConstants.SectionSpacing}"
+                   Visibility="{Binding IsFullScreen, Converter={StaticResource FullScreenBarVisibilityConverter}}">
             <Button DockPanel.Dock="Right" Content="{Binding Mode, Converter={StaticResource ModeToggleLabelConverter}}"
                     Command="{Binding ToggleModeCommand}" />
             <Button DockPanel.Dock="Right" Content="{Binding IsPlaying, Converter={StaticResource PlaybackToggleLabelConverter}}"
                     Command="{Binding TogglePlaybackCommand}"
+                    Visibility="{Binding Mode, Converter={StaticResource AppModeVisibilityConverter}, ConverterParameter=Play}" />
+            <Button DockPanel.Dock="Right" Content="{Binding IsFullScreen, Converter={StaticResource FullScreenToggleLabelConverter}}"
+                    Command="{Binding ToggleFullScreenCommand}"
                     Visibility="{Binding Mode, Converter={StaticResource AppModeVisibilityConverter}, ConverterParameter=Play}" />
         </DockPanel>
 

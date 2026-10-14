@@ -28,19 +28,22 @@
         </DataTemplate>
     </UserControl.Resources>
 
-    <!-- キャンバスのみをフル表示する。ループ再生の時刻更新はMainViewModelが行う。 -->
-    <Viewbox Stretch="Uniform">
-        <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
-            <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
-            <ItemsControl Background="Transparent" IsHitTestVisible="False"
-                          ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
-                          ItemContainerStyle="{StaticResource ObjectContainerStyle}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas IsItemsHost="True" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ItemsControl>
-        </Grid>
-    </Viewbox>
+    <!-- キャンバスのみをフル表示する。ループ再生の時刻更新はMainViewModelが行う。
+         アスペクト比を保ったまま拡縮するため、はみ出す余白はBackground="Black"で黒塗りにする(全画面時のレターボックス)。 -->
+    <Grid Background="Black">
+        <Viewbox Stretch="Uniform">
+            <Grid Width="{x:Static styles:LayoutConstants.CanvasWidth}" Height="{x:Static styles:LayoutConstants.CanvasHeight}">
+                <Border Background="{Binding BackgroundColorHex, Converter={StaticResource HexColorToBrushConverter}}" />
+                <ItemsControl Background="Transparent" IsHitTestVisible="False"
+                              ItemsSource="{Binding VisibleObjects}" ItemTemplate="{StaticResource ObjectTemplate}"
+                              ItemContainerStyle="{StaticResource ObjectContainerStyle}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas IsItemsHost="True" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+        </Viewbox>
+    </Grid>
 </UserControl>

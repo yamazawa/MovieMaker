@@ -175,4 +175,10 @@
   <data name="Button_ResumePlayback" xml:space="preserve">
     <value>再開</value>
   </data>
+  <data name="Button_EnterFullScreen" xml:space="preserve">
+    <value>全画面</value>
+  </data>
+  <data name="Button_ExitFullScreen" xml:space="preserve">
+    <value>全画面を終了</value>
+  </data>
 </root>
