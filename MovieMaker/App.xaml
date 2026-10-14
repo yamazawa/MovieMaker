@@ -11,5 +11,6 @@
         -->
         <conv:FullScreenWindowStyleConverter x:Key="FullScreenWindowStyleConverter" />
         <conv:FullScreenWindowStateConverter x:Key="FullScreenWindowStateConverter" />
+        <conv:FullScreenMaxSizeConverter x:Key="FullScreenMaxSizeConverter" />
     </Application.Resources>
 </Application>
