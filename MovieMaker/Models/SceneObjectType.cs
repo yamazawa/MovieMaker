@@ -7,4 +7,5 @@ public enum SceneObjectType
 {
     Text,
     Image,
+    Audio,
 }
