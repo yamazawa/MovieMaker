@@ -11,6 +11,7 @@
     <UserControl.Resources>
         <conv:MultiplyConverter x:Key="MultiplyConverter" />
         <conv:AlignStateBrushConverter x:Key="AlignStateBrushConverter" />
+        <conv:SceneObjectTypeBrushConverter x:Key="SceneObjectTypeBrushConverter" />
 
         <!--
             タイムチャート内のオブジェクトの表示順はMainViewModel.Objectsの並び順そのもの。
@@ -40,7 +41,8 @@
         <!-- クリックで選択、バー本体のドラッグで長さを保ったまま左右移動、左右端のドラッグで表示開始/終了時刻を編集できる(いずれも1秒単位)。 -->
         <DataTemplate x:Key="BarTemplate">
             <Border Height="{Binding DataContext.TimelineRowHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    Background="SteelBlue" CornerRadius="2" Cursor="SizeWE" BorderThickness="2"
+                    Background="{Binding Type, Converter={StaticResource SceneObjectTypeBrushConverter}}"
+                    CornerRadius="2" Cursor="SizeWE" BorderThickness="2"
                     behaviors:SelectOnClickBehavior.Command="{Binding DataContext.SelectTimelineObjectCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                     behaviors:TimelineBarMoveBehavior.IsEnabled="True">
                 <Border.BorderBrush>
