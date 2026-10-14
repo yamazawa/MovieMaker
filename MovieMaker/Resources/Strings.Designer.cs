@@ -325,5 +325,23 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_DeleteTimeRange", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   停止 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_PausePlayback {
+            get {
+                return ResourceManager.GetString("Button_PausePlayback", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   再開 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_ResumePlayback {
+            get {
+                return ResourceManager.GetString("Button_ResumePlayback", resourceCulture);
+            }
+        }
     }
 }
