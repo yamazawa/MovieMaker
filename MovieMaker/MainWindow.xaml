@@ -33,6 +33,7 @@
         <KeyBinding Modifiers="Control" Key="C" Command="{Binding CopyCommand}" />
         <KeyBinding Modifiers="Control" Key="V" Command="{Binding PasteCommand}" />
         <KeyBinding Key="Escape" Command="{Binding ExitFullScreenCommand}" />
+        <KeyBinding Key="F5" Command="{Binding ToggleModeCommand}" />
     </Window.InputBindings>
     <Grid Margin="{Binding IsFullScreen, Converter={StaticResource FullScreenMarginConverter}}">
         <Grid.RowDefinitions>

@@ -62,10 +62,10 @@
     <value>MovieMaker</value>
   </data>
   <data name="Button_SwitchToPlayMode" xml:space="preserve">
-    <value>再生モードへ切替</value>
+    <value>再生モードへ切替(F5)</value>
   </data>
   <data name="Button_SwitchToCreateMode" xml:space="preserve">
-    <value>作成モードへ切替</value>
+    <value>作成モードへ切替(F5)</value>
   </data>
   <data name="Header_Palette" xml:space="preserve">
     <value>編集パレット</value>

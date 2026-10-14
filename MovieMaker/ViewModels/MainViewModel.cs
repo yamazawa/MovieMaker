@@ -217,6 +217,7 @@ public partial class MainViewModel : ObservableObject
         if (value == AppMode.Play)
         {
             IsPlaying = true;
+            IsFullScreen = true;
             _lastPlaybackTick = DateTime.UtcNow;
             _playbackTimer.Start();
             UpdateAudioPlayback();
