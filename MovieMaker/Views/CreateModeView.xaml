@@ -111,6 +111,12 @@
                     <Button Content="{x:Static resx:Strings.Button_AddImage}"
                             Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
                             Command="{Binding AddImageFromClipboardCommand}" />
+                    <Button Content="{x:Static resx:Strings.Button_AddBgm}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddBgmCommand}" />
+                    <Button Content="{x:Static resx:Strings.Button_AddSe}"
+                            Margin="{x:Static styles:LayoutConstants.ButtonSpacing}"
+                            Command="{Binding AddSeCommand}" />
 
                     <!-- 動画全体の長さ(1秒～10分)。入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
                     <StackPanel Margin="{x:Static styles:LayoutConstants.ElementSpacing}">
@@ -155,6 +161,12 @@
                             <TextBox Text="{Binding SelectedObject.FontSize}"
                                      behaviors:UndoSnapshotOnFocusBehavior.IsEnabled="True"
                                      Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                        </StackPanel>
+
+                        <StackPanel Visibility="{Binding SelectedObject.Type, Converter={StaticResource SceneObjectTypeVisibilityConverter}, ConverterParameter=Audio}">
+                            <TextBlock Text="{x:Static resx:Strings.Label_AudioFileName}" Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
+                            <TextBlock Text="{Binding SelectedObject.AudioFileName}" TextWrapping="Wrap" Opacity="0.7"
+                                       Margin="{x:Static styles:LayoutConstants.FieldSpacing}" />
                         </StackPanel>
 
                         <!-- 入力中は範囲チェックをかけず、フォーカスアウト時に反映する。 -->
