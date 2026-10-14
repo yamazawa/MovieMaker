@@ -14,16 +14,22 @@
         Width="{Binding WindowWidth, Mode=TwoWay}"
         MinHeight="{x:Static styles:LayoutConstants.WindowMinHeight}"
         MinWidth="{x:Static styles:LayoutConstants.WindowMinWidth}"
-        FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}">
+        FontFamily="{x:Static styles:LayoutConstants.DefaultFontFamily}"
+        WindowStyle="{Binding IsFullScreen, Converter={StaticResource FullScreenWindowStyleConverter}}"
+        WindowState="{Binding IsFullScreen, Converter={StaticResource FullScreenWindowStateConverter}}">
     <Window.Resources>
         <conv:AppModeVisibilityConverter x:Key="AppModeVisibilityConverter" />
         <conv:ModeToggleLabelConverter x:Key="ModeToggleLabelConverter" />
         <conv:PlaybackToggleLabelConverter x:Key="PlaybackToggleLabelConverter" />
+        <conv:FullScreenWindowStyleConverter x:Key="FullScreenWindowStyleConverter" />
+        <conv:FullScreenWindowStateConverter x:Key="FullScreenWindowStateConverter" />
+        <conv:FullScreenToggleLabelConverter x:Key="FullScreenToggleLabelConverter" />
     </Window.Resources>
     <Window.InputBindings>
         <KeyBinding Modifiers="Control" Key="Z" Command="{Binding UndoCommand}" />
         <KeyBinding Modifiers="Control" Key="C" Command="{Binding CopyCommand}" />
         <KeyBinding Modifiers="Control" Key="V" Command="{Binding PasteCommand}" />
+        <KeyBinding Key="Escape" Command="{Binding ExitFullScreenCommand}" />
     </Window.InputBindings>
     <Grid Margin="{x:Static styles:LayoutConstants.RootMargin}">
         <Grid.RowDefinitions>
@@ -37,6 +43,9 @@
                     Command="{Binding ToggleModeCommand}" />
             <Button DockPanel.Dock="Right" Content="{Binding IsPlaying, Converter={StaticResource PlaybackToggleLabelConverter}}"
                     Command="{Binding TogglePlaybackCommand}"
+                    Visibility="{Binding Mode, Converter={StaticResource AppModeVisibilityConverter}, ConverterParameter=Play}" />
+            <Button DockPanel.Dock="Right" Content="{Binding IsFullScreen, Converter={StaticResource FullScreenToggleLabelConverter}}"
+                    Command="{Binding ToggleFullScreenCommand}"
                     Visibility="{Binding Mode, Converter={StaticResource AppModeVisibilityConverter}, ConverterParameter=Play}" />
         </DockPanel>
 
