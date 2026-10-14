@@ -68,7 +68,34 @@ namespace MovieMaker.Resources {
                 return ResourceManager.GetString("Button_AddImage", resourceCulture);
             }
         }
-        
+
+        /// <summary>
+        ///   BGMを追加 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_AddBgm {
+            get {
+                return ResourceManager.GetString("Button_AddBgm", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   SEを追加 に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Button_AddSe {
+            get {
+                return ResourceManager.GetString("Button_AddSe", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   音声ファイル に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        public static string Label_AudioFileName {
+            get {
+                return ResourceManager.GetString("Label_AudioFileName", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   文字を追加 に類似しているローカライズされた文字列を検索します。
         /// </summary>

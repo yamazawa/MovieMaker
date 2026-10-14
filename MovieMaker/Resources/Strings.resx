@@ -76,6 +76,15 @@
   <data name="Button_AddImage" xml:space="preserve">
     <value>画像を追加(クリップボードから)</value>
   </data>
+  <data name="Button_AddBgm" xml:space="preserve">
+    <value>BGMを追加</value>
+  </data>
+  <data name="Button_AddSe" xml:space="preserve">
+    <value>SEを追加</value>
+  </data>
+  <data name="Label_AudioFileName" xml:space="preserve">
+    <value>音声ファイル</value>
+  </data>
   <data name="Header_ObjectProperties" xml:space="preserve">
     <value>選択中オブジェクト</value>
   </data>
